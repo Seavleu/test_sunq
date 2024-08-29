@@ -151,3 +151,8 @@ export interface GetErrorAlarmListRequest {
     end_date: string;
     page: string;
 }
+
+declare type TabNavigatorProps = {
+    title: string;
+    routePath: string;
+  };

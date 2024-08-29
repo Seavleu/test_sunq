@@ -146,7 +146,7 @@ const ErrorFixListScreen = () => {
     <ScrollView style={styles.container}>
       <View style={styles.tabContainer}>
         <TabNavigator title="이력" routePath="/error-fix/history/list" />
-        <TabNavigator title="등록" routePath="/" />
+        <TabNavigator title="등록" routePath="/error-fix/history/detail/" />
       </View>
       <Text style={styles.headerText}>장비알람 설정</Text>
       <Text style={styles.subHeaderText}>

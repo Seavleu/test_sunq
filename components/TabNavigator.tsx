@@ -2,16 +2,9 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useRouter, usePathname } from 'expo-router';
 
-type TabNavigatorProps = {
-  title: string;
-  routePath: string;
-};
-
 const TabNavigator = ({ title, routePath }: TabNavigatorProps) => {
   const router = useRouter();
   const pathname = usePathname();
-
-  // Determine if the current pathname matches the routePath
   const isActive = pathname === routePath;
 
   return (

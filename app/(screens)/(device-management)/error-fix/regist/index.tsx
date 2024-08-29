@@ -10,13 +10,10 @@ import {
   Modal,
   FlatList,
   TouchableWithoutFeedback,
-  Image,
-  StatusBar,
-  Platform,
+  Image, 
 } from "react-native";
 import * as ImagePicker from "expo-image-picker";
-import * as DocumentPicker from "expo-document-picker";
-import { SafeAreaView } from "react-native-safe-area-context";
+import * as DocumentPicker from "expo-document-picker"; 
 
 import { icons, images } from "@/constants";
 import theme from "@/constants/theme";
@@ -134,7 +131,7 @@ const ErrorFixRegistScreen = () => {
     });
   };
   const navigateChart = () => {
-    router.replace("/PowerStatus/current");
+    router.replace("/");
   };
   return (
     <ScrollView style={styles.container}>
@@ -145,8 +142,7 @@ const ErrorFixRegistScreen = () => {
       <Text style={styles.title}>문제조치 등록</Text>
       <Text style={styles.subtitle}>
         문제가 발생하여 조치한 내용을 현장 사진과 함께 등록해 주세요.
-      </Text>
-
+      </Text> 
       <View style={styles.formGroup}>
         <TouchableOpacity
           style={[styles.input, dropdownVisible && styles.inputFocused]}

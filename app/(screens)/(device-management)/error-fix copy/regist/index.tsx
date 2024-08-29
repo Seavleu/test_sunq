@@ -137,163 +137,165 @@ const ErrorFixRegistScreen = () => {
     router.replace("/PowerStatus/current");
   };
   return (
-    <ScrollView style={styles.container}>
-      <View style={styles.tabContainer}>
-        <TabNavigator title="이력" routePath="/error-fix/history/list" />
-        <TabNavigator title="등록" routePath="/" />
-      </View>
-      <Text style={styles.title}>문제조치 등록</Text>
-      <Text style={styles.subtitle}>
-        문제가 발생하여 조치한 내용을 현장 사진과 함께 등록해 주세요.
-      </Text>
-
-      <View style={styles.formGroup}>
-        <TouchableOpacity
-          style={[styles.input, dropdownVisible && styles.inputFocused]}
-          onPress={() => setDropdownVisible(true)}
-        >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.inputText}>
-              {selectTitle || "장치상태 선택"}
-            </Text>
-            <Image
-              source={icons.down02}
-              resizeMode="contain"
-              style={[
-                styles.arrowIcon,
-                dropdownVisible && styles.arrowIconOpen,
-              ]}
-            />
-          </View>
-        </TouchableOpacity>
-
-        <Modal
-          visible={dropdownVisible}
-          transparent={true}
-          animationType="fade"
-          onRequestClose={() => setDropdownVisible(false)}
-        >
-          <TouchableWithoutFeedback onPress={() => setDropdownVisible(false)}>
-            <View style={styles.modalOverlay} />
-          </TouchableWithoutFeedback>
-          <View style={styles.modalContent}>
-            <FlatList
-              data={staticDeviceErrList}
-              keyExtractor={(item) => item.device_error_seq.toString()}
-              renderItem={({ item }) => (
-                <TouchableOpacity
-                  style={styles.dropdownItem}
-                  onPress={() => handleTitleSelect(item)}
-                >
-                  <Text style={styles.dropdownItemText}>{item.title}</Text>
-                </TouchableOpacity>
-              )}
-            />
-          </View>
-        </Modal>
-
-        <TextInput
-          ref={titleInputRef}
-          style={styles.input}
-          placeholder="문제조치 내용의 제목을 입력해 주세요."
-          value={reqData.title}
-          onChangeText={(text) => handleInputChange("title", text)}
-          placeholderTextColor="#7B7B8B"
-          onFocus={() => handleFocus(titleInputRef)}
-          onBlur={() => handleBlur(titleInputRef)}
-        />
-        <TextInput
-          ref={contentInputRef}
-          style={[styles.input, styles.textArea]}
-          placeholder="문제조치 내용 입력"
-          value={reqData.content}
-          onChangeText={(text) => handleInputChange("content", text)}
-          multiline={true}
-          placeholderTextColor="#7B7B8B"
-          onFocus={() => handleFocus(contentInputRef)}
-          onBlur={() => handleBlur(contentInputRef)}
-        />
-      </View>
-
-      {/* Image Attachment Section */}
-      <View style={styles.attachmentContainer}>
-        <Text style={styles.attachmentTitle}>현장사진 첨부</Text>
-        <Text style={styles.attachmentSubtitle}>
-          현장사진은 최대 10장까지 등록 가능합니다.
+    <SafeAreaView style={styles.safeArea}>
+      <ScrollView contentContainerStyle={styles.container}>
+        <View style={styles.tabContainer}>
+          <TabNavigator title="이력" routePath="/error-fix/history/list" />
+          <TabNavigator title="등록" routePath="/" />
+        </View>
+        <Text style={styles.title}>문제조치 등록</Text>
+        <Text style={styles.subtitle}>
+          문제가 발생하여 조치한 내용을 현장 사진과 함께 등록해 주세요.
         </Text>
-        <Image
-          source={images.dottedLine}
-          style={styles.dottedLine}
-          resizeMode="contain"
-        />
 
-        {files.map((file, index) => (
-          <View key={index} style={styles.fileRow}>
-            <Text style={styles.selectedFileText}>
-              {file.name || file.uri.split("/").pop()}
-            </Text>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeleteFile(index)}
+        <View style={styles.formGroup}>
+          <TouchableOpacity
+            style={[styles.input, dropdownVisible && styles.inputFocused]}
+            onPress={() => setDropdownVisible(true)}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                justifyContent: "space-between",
+                alignItems: "center",
+              }}
             >
-              <Text style={styles.deleteButtonText}>삭제</Text>
+              <Text style={styles.inputText}>
+                {selectTitle || "장치상태 선택"}
+              </Text>
+              <Image
+                source={icons.down02}
+                resizeMode="contain"
+                style={[
+                  styles.arrowIcon,
+                  dropdownVisible && styles.arrowIconOpen,
+                ]}
+              />
+            </View>
+          </TouchableOpacity>
+
+          <Modal
+            visible={dropdownVisible}
+            transparent={true}
+            animationType="fade"
+            onRequestClose={() => setDropdownVisible(false)}
+          >
+            <TouchableWithoutFeedback onPress={() => setDropdownVisible(false)}>
+              <View style={styles.modalOverlay} />
+            </TouchableWithoutFeedback>
+            <View style={styles.modalContent}>
+              <FlatList
+                data={staticDeviceErrList}
+                keyExtractor={(item) => item.device_error_seq.toString()}
+                renderItem={({ item }) => (
+                  <TouchableOpacity
+                    style={styles.dropdownItem}
+                    onPress={() => handleTitleSelect(item)}
+                  >
+                    <Text style={styles.dropdownItemText}>{item.title}</Text>
+                  </TouchableOpacity>
+                )}
+              />
+            </View>
+          </Modal>
+
+          <TextInput
+            ref={titleInputRef}
+            style={styles.input}
+            placeholder="문제조치 내용의 제목을 입력해 주세요."
+            value={reqData.title}
+            onChangeText={(text) => handleInputChange("title", text)}
+            placeholderTextColor="#7B7B8B"
+            onFocus={() => handleFocus(titleInputRef)}
+            onBlur={() => handleBlur(titleInputRef)}
+          />
+          <TextInput
+            ref={contentInputRef}
+            style={[styles.input, styles.textArea]}
+            placeholder="문제조치 내용 입력"
+            value={reqData.content}
+            onChangeText={(text) => handleInputChange("content", text)}
+            multiline={true}
+            placeholderTextColor="#7B7B8B"
+            onFocus={() => handleFocus(contentInputRef)}
+            onBlur={() => handleBlur(contentInputRef)}
+          />
+        </View>
+
+        {/* Image Attachment Section */}
+        <View style={styles.attachmentContainer}>
+          <Text style={styles.attachmentTitle}>현장사진 첨부</Text>
+          <Text style={styles.attachmentSubtitle}>
+            현장사진은 최대 10장까지 등록 가능합니다.
+          </Text>
+          <Image
+            source={images.dottedLine}
+            style={styles.dottedLine}
+            resizeMode="contain"
+          />
+
+          {files.map((file, index) => (
+            <View key={index} style={styles.fileRow}>
+              <Text style={styles.selectedFileText}>
+                {file.name || file.uri.split("/").pop()}
+              </Text>
+              <TouchableOpacity
+                style={styles.deleteButton}
+                onPress={() => handleDeleteFile(index)}
+              >
+                <Text style={styles.deleteButtonText}>삭제</Text>
+              </TouchableOpacity>
+            </View>
+          ))}
+
+          <TextInput
+            style={styles.fileInput}
+            placeholder="파일을 등록해주세요."
+            placeholderTextColor="#7B7B8B"
+            value={
+              selectedFile?.name || selectedFile?.uri?.split("/").pop() || ""
+            }
+            editable={false}
+          />
+
+          <View style={styles.addCancelButtons}>
+            <TouchableOpacity
+              style={styles.selectFileButton}
+              onPress={handleFileSelection}
+            >
+              <Text style={styles.selectFileButtonText}>파일 찾기</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={handleAddFile}
+              disabled={!selectedFile}
+            >
+              <Text style={styles.addButtonText}>추가</Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.addButton}
+              onPress={handleCancelFile}
+            >
+              <Text style={styles.addButtonText}>삭제</Text>
             </TouchableOpacity>
           </View>
-        ))}
+        </View>
 
-        <TextInput
-          style={styles.fileInput}
-          placeholder="파일을 등록해주세요."
-          placeholderTextColor="#7B7B8B"
-          value={
-            selectedFile?.name || selectedFile?.uri?.split("/").pop() || ""
-          }
-          editable={false}
-        />
-
-        <View style={styles.addCancelButtons}>
-          <TouchableOpacity
-            style={styles.selectFileButton}
-            onPress={handleFileSelection}
-          >
-            <Text style={styles.selectFileButtonText}>파일 찾기</Text>
+        <View style={styles.buttonContainer}>
+          <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
+            <Text style={styles.buttonText}>
+              {reqData.device_error_seq ? "문제조치 수정" : "문제조치 등록"}
+            </Text>
           </TouchableOpacity>
           <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleAddFile}
-            disabled={!selectedFile}
+            style={styles.cancelButton}
+            onPress={() => Alert.alert("Cancelled", "Registration cancelled.")}
           >
-            <Text style={styles.addButtonText}>추가</Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleCancelFile}
-          >
-            <Text style={styles.addButtonText}>삭제</Text>
+            <Text style={styles.buttonText}>취소</Text>
           </TouchableOpacity>
         </View>
-      </View>
-
-      <View style={styles.buttonContainer}>
-        <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
-          <Text style={styles.buttonText}>
-            {reqData.device_error_seq ? "문제조치 수정" : "문제조치 등록"}
-          </Text>
-        </TouchableOpacity>
-        <TouchableOpacity
-          style={styles.cancelButton}
-          onPress={() => Alert.alert("Cancelled", "Registration cancelled.")}
-        >
-          <Text style={styles.buttonText}>취소</Text>
-        </TouchableOpacity>
-      </View>
-    </ScrollView>
+      </ScrollView>
+    </SafeAreaView>
   );
 };
 
@@ -315,14 +317,17 @@ const commonTextStyle = {
 };
 
 const styles = StyleSheet.create({
+  safeArea: { 
+    backgroundColor: '#000C65',  
+  },
   tabContainer: {
-    flexDirection: 'row',
+    flexDirection: 'row', 
     marginBottom: 20,
   },
   container: {
-    flexGrow: 1,
+    flexGrow: 1,   
     padding: 16,
-    backgroundColor: theme.colors.background,
+    backgroundColor: theme.colors.background, 
   },
   title: {
     fontSize: 24,
@@ -381,7 +386,7 @@ const styles = StyleSheet.create({
     padding: 20,
     width: "92%",
     margin: 17,
-    top: '50%',
+    top:'50%',
     position: "absolute",
   },
   dropdownItem: {

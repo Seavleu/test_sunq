@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useNavigation } from "expo-router";
+import { useRouter } from "expo-router"; // Use router for navigation
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -17,7 +17,7 @@ import theme from "../constants/theme";
 import GradientLine from "./GradientLine";
 
 const Header = () => {
-  const navigation = useNavigation();
+  const router = useRouter(); // Initialize the router
   const [menuVisible, setMenuVisible] = useState(false);
   const [selectedLocation, setSelectedLocation] = useState("파주 태양광 발전소");
   const [dropdownVisible, setDropdownVisible] = useState(false);
@@ -64,10 +64,10 @@ const Header = () => {
       id: "6",
       name: "장치관리",
       subItems: [
-        { id: "6-1", name: "장치 현황", route: "/device-management/device-status", icon: icons.menu4 },
-        { id: "6-2", name: "문제알람 이력", route: "/device-management/error-fix/history/list", icon: icons.menu4_1 },
-        { id: "6-3", name: "문제조치", route: "/device-management/error-fix/regist/index", icon: icons.menu4_2 },
-        { id: "6-4", name: "정기점검", route: "/device-management/inspection/history/list", icon: icons.menu4_3 },
+        { id: "6-1", name: "장치 현황", route: "/device-management/status", icon: icons.menu4 },
+        { id: "6-2", name: "문제알람 이력", route: "/device-management/error-history", icon: icons.menu4_1 },
+        { id: "6-3", name: "문제조치", route: "/(screens)/(device-management)/error-fix/history/", icon: icons.menu4_2 },
+        { id: "6-4", name: "정기점검", route: "/(screens)/(device-management)/error-fix/inspection", icon: icons.menu4_3 },
       ],
     },    
     { id: "7", name: "이상징후", subItems: [] },
@@ -211,8 +211,8 @@ const Header = () => {
                         <TouchableOpacity
                           key={subItem.id}
                           onPress={() => {
-                            console.log(`${subItem.name} selected`);
-                            navigation.navigate(subItem.route);
+                            toggleMenu(); // Close the menu
+                            router.push(subItem.route); // Navigate to the selected route
                           }}
                           style={styles.subMenuItem}
                         >

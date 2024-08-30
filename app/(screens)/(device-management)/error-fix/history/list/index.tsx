@@ -1,55 +1,42 @@
-import React, { useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-} from "react-native";
+import React, { useEffect, useState } from "react";
+import {View,Text,TextInput,FlatList,StyleSheet,ScrollView,Image,TouchableOpacity, Alert} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { images, icons } from "@/constants";
 import Button from "@/components/Button";
 import TabNavigator from "@/components/TabNavigator";
 import theme from "@/constants/theme";
+import { DEVICE_API } from "@/service/api/apis";
 
 const ErrorFixListScreen = () => {
-  const staticData = [
-    {
-      device_error_fix_seq: 1,
-      device_type: "INVERTER",
-      title: "Internal Communication Issue",
-      content: "Resolved the internal communication issue in Inverter 1.",
-      reg_date: "2023-08-30 14:00",
-      view_cnt: 138,
-    },
-    {
-      device_error_fix_seq: 2,
-      device_type: "BATTERY",
-      title: "Battery Overheating",
-      content: "Handled the overheating problem in Battery 3.",
-      reg_date: "2023-07-25 10:30",
-      view_cnt: 87,
-    },
-    {
-      device_error_fix_seq: 3,
-      device_type: "SOLAR PANEL",
-      title: "Solar Panel Damage",
-      content: "Fixed the damaged solar panel in Sector 5.",
-      reg_date: "2023-09-10 09:15",
-      view_cnt: 45,
-    },
-  ];
-
-  const [resData] = useState(staticData);
-  const [displayedData, setDisplayedData] = useState(staticData.slice(0, 2)); // Limit to 2 items initially
+  const [resData, setResData] = useState([]);
+  const [displayedData, setDisplayedData] = useState([]);  
   const [searchText, setSearchText] = useState("");
   const [searchActive, setSearchActive] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("제목");
   const navigation = useNavigation();
+  const [isLoading, setIsLoading] = useState(true);
+ 
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const response = await DEVICE_API.getErrorFixList({});
+        if (response.data && response.data.length > 0) {
+          setResData(response.data);
+          setDisplayedData(response.data.slice(0, 2));  
+        } else {
+          Alert.alert("No data found", "No error fixes found.");
+        }
+      } catch (error) {
+        console.error("Failed to fetch error fixes:", error);
+        Alert.alert("Error", "Failed to fetch data.");
+      } finally {
+        setIsLoading(false);
+      }
+    };
+
+    fetchData();
+  }, []);
 
   const handleSearch = () => {
     if (searchText.length > 1) {
@@ -57,7 +44,7 @@ const ErrorFixListScreen = () => {
         (item) =>
           item.title.includes(searchText) || item.content.includes(searchText)
       );
-      setDisplayedData(filtered.slice(0, 2)); // Limit to 2 items initially
+      setDisplayedData(filtered.slice(0, 2));  
       setSearchActive(true);
     } else {
       alert("검색어를 최소 2자 이상 입력해 주세요.");
@@ -66,7 +53,7 @@ const ErrorFixListScreen = () => {
 
   const handleResetSearch = () => {
     setSearchText("");
-    setDisplayedData(resData.slice(0, 2)); // Reset to initial limit
+    setDisplayedData(resData.slice(0, 2)); 
     setSearchActive(false);
   };
 
@@ -228,7 +215,7 @@ const ErrorFixListScreen = () => {
         renderItem={renderItem}
         keyExtractor={(item) => item.device_error_fix_seq.toString()}
         ListEmptyComponent={
-          <Text style={styles.emptyText}>No results found</Text>
+          <Text>No results found</Text>
         }
       />
       {displayedData.length < resData.length && (

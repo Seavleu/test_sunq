@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, TouchableOpacity, Image, ScrollView, Modal, SafeAreaView, Alert, StyleSheet, Dimensions } from 'react-native';
+import { View, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, SafeAreaView, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
@@ -26,85 +26,87 @@ const LoginScreen = () => {
         const savedId = await AsyncStorage.getItem('savedId');
         const autoLoginFlag = await AsyncStorage.getItem('autoLoginFlag');
         const token = await AsyncStorage.getItem('authToken');
-  
+
         if (savedId) {
           setForm(prev => ({ ...prev, id: savedId }));
+          console.log('Saved ID retrieved:', savedId);
+
           setSaveId(true);
+        } else {
+          console.log('No saved ID found')
         }
-  
+
         if (autoLoginFlag && token) {
           setAutoLogin(true);
-          // Automatically set the token in userStore if it exists
+          console.log('Token retrieved securely:', token)
           userStore.setToken(token);
-  
+
           await handleAutoLogin();
         } else if (token) {
-          // If token exists but auto-login is off, just set the token in userStore
           userStore.setToken(token);
+          console.log('No token found in SecureStore.');
         }
       } catch (error) {
         console.error('Failed to load settings', error);
       }
     };
-  
+
     loadSettings();
   }, []);
-  
 
   const submit = async () => {
     if (form.id === '' || form.pw === '') {
       Alert.alert('오류', '모든 입력란을 작성해 주세요.');
       return;
     }
-  
+
     setSubmitting(true);
-  
+
     try {
       const response = await LOGIN_API.login({
         user_id: form.id,
         user_pw: form.pw,
         sun_q_a_t: '',
       });
-  
+
       if (response.data.result === 0) {
-        const { token } = response.data;
-  
+        const { token } = response.data.data;
+
         if (saveId || autoLogin) {
           await AsyncStorage.setItem('savedId', form.id);
         } else {
           await AsyncStorage.removeItem('savedId');
         }
-  
+
         if (autoLogin) {
           await AsyncStorage.setItem('authToken', token);
-          await AsyncStorage.setItem('savedPassword', form.pw);  
+          await AsyncStorage.setItem('savedPassword', form.pw);
           await AsyncStorage.setItem('autoLoginFlag', 'true');
         } else {
           await AsyncStorage.removeItem('autoLoginFlag');
           await AsyncStorage.removeItem('authToken');
-          await AsyncStorage.removeItem('savedPassword'); 
+          await AsyncStorage.removeItem('savedPassword');
         }
-  
-        // Set token in userStore after storing it in AsyncStorage
+
         userStore.setToken(token);
         console.log('User Store Token:', userStore.token);
-   
+
         router.replace('/(device-management)/error-fix/history/list');
       } else {
         setError(response.data.message);
       }
     } catch (error) {
+      console.error('Login error:', error);
       setError('An error occurred during login. Please try again.');
     } finally {
       setSubmitting(false);
     }
   };
-  
-  
+
   const handleAutoLogin = async () => {
     try {
       const savedId = await AsyncStorage.getItem('savedId');
-      const savedPassword = await AsyncStorage.getItem('savedPassword'); 
+      const savedPassword = await AsyncStorage.getItem('savedPassword');
       const token = await AsyncStorage.getItem('authToken');
 
       if (savedId && savedPassword && token) {
@@ -115,14 +117,18 @@ const LoginScreen = () => {
         });
 
         if (response.data.result === 0) {
+          userStore.setToken(token);
           router.replace('/(device-management)/error-fix/history/list');
         } else {
+          console.error('Auto login failed:', response.data.message);
           setError('Auto login failed. Please log in manually.');
         }
       } else {
+        console.warn('Auto login failed: Missing token, user_id, or user_pw');
         setError('Auto login failed. Please log in manually.');
       }
     } catch (error) {
+      console.error('Auto login error:', error);
       setError('Auto login failed. Please log in manually.');
     }
   };
@@ -130,11 +136,10 @@ const LoginScreen = () => {
   return (
     <SafeAreaView style={styles.safeArea}>
       <ScrollView contentContainerStyle={styles.scrollViewContent}>
-      <Image source={images.bg_main} resizeMode='cover' style={styles.backgroundImage} />
-
-      <View style={styles.overlay} />
+        <Image source={images.bg_main} resizeMode="cover" style={styles.backgroundImage} />
+        <View style={styles.overlay} />
         <View style={styles.container}>
-          <TouchableOpacity onPress={() => navigation.navigate('index')}>
+          <TouchableOpacity onPress={() => router.push('/')}>
             <Image
               source={images.logo}
               resizeMode="contain"
@@ -184,8 +189,8 @@ const LoginScreen = () => {
               <CustomCheckBox
                 value={saveId}
                 onValueChange={() => setSaveId(!saveId)}
+                label="아이디 저장"
               />
-              <Text style={styles.checkBoxLabel}>아이디 저장</Text>
             </View>
 
             <View style={styles.checkBoxWrapper}>
@@ -193,10 +198,10 @@ const LoginScreen = () => {
                 value={autoLogin}
                 onValueChange={() => {
                   setAutoLogin(!autoLogin);
-                  if (!autoLogin) setSaveId(true);  
+                  if (!autoLogin) setSaveId(true);
                 }}
+                label="자동 로그인"
               />
-              <Text style={styles.checkBoxLabel}>자동 로그인</Text>
             </View>
           </View>
 
@@ -266,8 +271,8 @@ const styles = StyleSheet.create({
     marginTop: 28,
   },
   checkBoxContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
+    flexDirection: 'row', 
+    gap: 8,
     marginTop: 18,
   },
   checkBoxWrapper: {
@@ -289,6 +294,6 @@ const styles = StyleSheet.create({
     color: 'rgba(255, 255, 255, 0.50)',
     marginTop: 12,
   },
-}); 
+});
 
 export default LoginScreen;

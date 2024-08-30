@@ -1,44 +1,50 @@
 import { makeAutoObservable } from 'mobx';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 class UserStore {
   token: string | null = null;
-  userInfo: any = null;  
+  userInfo: any = null;
 
   constructor() {
     makeAutoObservable(this);
     this.loadToken();
+    this.loadUserInfo();
   }
 
-  setToken(token: string) {
+  async setToken(token: string) {
     this.token = token;
-    AsyncStorage.setItem('authToken', token);
+    await SecureStore.setItemAsync('authToken', token);
+    console.log('Token stored securely:', token);
   }
 
   async loadToken() {
-    const token = await AsyncStorage.getItem('authToken');
+    const token = await SecureStore.getItemAsync('authToken');
     if (token) {
       this.token = token;
+
+      console.log('Token retrieved securely:', token);
+    } else {
+      console.log('No token found in SecureStore.');
     }
   }
 
-  setUserInfo(userInfo: any) {
+  async setUserInfo(userInfo: any) {
     this.userInfo = userInfo;
-    AsyncStorage.setItem('userInfo', JSON.stringify(userInfo));
+    await SecureStore.setItemAsync('userInfo', JSON.stringify(userInfo));
   }
 
   async loadUserInfo() {
-    const userInfo = await AsyncStorage.getItem('userInfo');
+    const userInfo = await SecureStore.getItemAsync('userInfo');
     if (userInfo) {
       this.userInfo = JSON.parse(userInfo);
     }
   }
 
-  logout() {
+  async logout() {
     this.token = null;
     this.userInfo = null;
-    AsyncStorage.removeItem('authToken');
-    AsyncStorage.removeItem('userInfo');
+    await SecureStore.deleteItemAsync('authToken');
+    await SecureStore.deleteItemAsync('userInfo');
   }
 }
 

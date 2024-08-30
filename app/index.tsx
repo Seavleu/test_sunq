@@ -3,6 +3,7 @@ import { View, Text } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import userStore from '../stores/userStore';
 import { useRouter } from 'expo-router';
+import LogoutButton from '@/components/LogoutButton';
 
 const HomeScreen = observer(() => {
   const router = useRouter();
@@ -26,7 +27,9 @@ const HomeScreen = observer(() => {
   return (
     <View>
       <Text>Welcome to the Home Screen</Text>
-      {/* Render your authenticated screens here */}
+      <Text>
+        <LogoutButton />
+      </Text> 
     </View>
   );
 });

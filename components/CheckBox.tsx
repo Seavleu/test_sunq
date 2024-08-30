@@ -1,42 +1,45 @@
 import React from 'react';
-import { TouchableWithoutFeedback, View, StyleSheet } from 'react-native';
-import { MaterialIcons } from '@expo/vector-icons';
+import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 
-const CustomCheckBox = ({ value, onValueChange } : CustomCheckBoxProps) => {
+interface CustomCheckBoxProps {
+  value: boolean;
+  onValueChange: (newValue: boolean) => void;
+  label?: string;
+}
+
+const CustomCheckBox: React.FC<CustomCheckBoxProps> = ({ value, onValueChange, label }) => {
   return (
-    <TouchableWithoutFeedback onPress={onValueChange}>
-      <View style={styles.checkBoxContainer}>
-        <View style={[styles.checkBox, value && styles.checked]}>
-          {value && (
-            <MaterialIcons name="check" size={22} color="#000000" style={styles.icon} />
-          )}
-        </View>
+    <TouchableOpacity onPress={() => onValueChange(!value)} style={styles.checkboxContainer}>
+      <View style={[styles.checkbox, value && styles.checkedCheckbox]}>
+        {value && <Ionicons name="checkmark" size={18} color="black" />}
       </View>
-    </TouchableWithoutFeedback>
+      {label && <Text style={styles.label}>{label}</Text>}
+    </TouchableOpacity>
   );
 };
 
 const styles = StyleSheet.create({
-  checkBoxContainer: {
+  checkboxContainer: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    marginBottom: 10,
+  },
+  checkbox: {
+    width: 24,
+    height: 24,
     justifyContent: 'center',
     alignItems: 'center',
     marginRight: 8,
+    backgroundColor: '#454f8b',
+    borderRadius: 8,
   },
-  checkBox: {
-    width: 22,  
-    height: 22,  
-    borderWidth: 2,
-    borderColor: '#ccc',
-    borderRadius: 4,  
-    justifyContent: 'center',
-    alignItems: 'center',
+  checkedCheckbox: {
     backgroundColor: '#fff',
   },
-  checked: {
-    backgroundColor: '#fff',
-  },
-  icon: {
-    fontWeight: 'bold',  
+  label: {
+    fontSize: 16,
+    color: '#fff',
   },
 });
 

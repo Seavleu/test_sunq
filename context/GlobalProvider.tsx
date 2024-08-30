@@ -1,12 +1,11 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from "react";
-import apiClient from "@/service/api/config";  
+import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
+import apiClient from '@/service/api/config';  
 import AsyncStorage from '@react-native-async-storage/async-storage';
 
- 
 interface User {
-    user_id: string;
-    user_pw: string;
-    sun_q_a_t: string;
+  user_id: string;
+  user_pw: string;
+  sun_q_a_t: string;
 }
 
 interface GlobalContextType {
@@ -16,7 +15,7 @@ interface GlobalContextType {
   setUser: React.Dispatch<React.SetStateAction<User | null>>;
   loading: boolean;
 }
- 
+
 interface GlobalProviderProps {
   children: ReactNode;
 }
@@ -39,16 +38,10 @@ const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
   useEffect(() => {
     const checkCurrentUser = async () => {
       try {
-        // Load token from AsyncStorage
         const token = await AsyncStorage.getItem('authToken');
-        
         if (token) {
-          // If there's a token, set it in the headers
           apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-
-          // Fetch the current user
           const response = await apiClient.get<User>('/api/current-user');
-          
           if (response.data) {
             setIsLogged(true);
             setUser(response.data);

@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { useRouter } from "expo-router"; // Use router for navigation
+import { Link, useRouter } from "expo-router"; // Use router for navigation
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,

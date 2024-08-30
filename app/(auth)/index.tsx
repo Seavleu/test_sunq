@@ -69,8 +69,12 @@ const LoginScreen = () => {
         sun_q_a_t: '',
       });
 
+      console.log('Attempting login with', response);
+
       if (response.data.result === 0) {
         const { token } = response.data.data;
+
+        // console.log('API Response:', response.data); 
 
         if (saveId || autoLogin) {
           await AsyncStorage.setItem('savedId', form.id);

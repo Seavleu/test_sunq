@@ -14,18 +14,8 @@ import { images, icons } from "@/constants";
 import Button from "@/components/Button";
 import TabNavigator from "@/components/TabNavigator";
 import theme from "@/constants/theme";
-import { createStackNavigator } from '@react-navigation/stack';
-
-
 
 const ErrorFixListScreen = () => {
-  type RootStackParamList = {
-    ErrorFixListScreen: undefined;
-    ErrorFixDetailScreen: { id: number };
-  };
-  
-  const Stack = createStackNavigator<RootStackParamList>();
-
   const staticData = [
     {
       device_error_fix_seq: 1,
@@ -76,7 +66,7 @@ const ErrorFixListScreen = () => {
 
   const handleResetSearch = () => {
     setSearchText("");
-    setDisplayedData(resData.slice(0, 2)); 
+    setDisplayedData(resData.slice(0, 2));
     setSearchActive(false);
   };
 
@@ -97,50 +87,25 @@ const ErrorFixListScreen = () => {
   const renderItem = ({ item }) => (
     <View style={styles.card}>
       <View style={{ paddingVertical: 8, gap: 16 }}>
-        <Text
-          style={{
-            color: "#7B7B8B",
-            fontSize: 20,
-            textAlign: "center",
-            fontWeight: "600",
-          }}
-        >
-          {item.device_type}
-        </Text>
-        <Image
-          source={images.dottedLine}
-          resizeMode="contain"
-          style={{ width: "100%" }}
-        />
+        <Text style={styles.deviceTypeText}>{item.device_type}</Text>
+        <Image source={images.dottedLine} resizeMode="contain" style={{ width: "100%" }} />
         <View style={{ gap: 8 }}>
-          <Text style={{ fontSize: 18, fontWeight: "bold" }}>{item.title}</Text>
-          <Text style={{ fontSize: 16 }}>{item.content}</Text>
-          <View style={{ flexDirection: "row", gap: 8, alignItems: "center" }}>
-            <Text style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.5)" }}>
-              현장기사
-            </Text>
+          <Text style={styles.titleText}>{item.title}</Text>
+          <Text style={styles.contentText}>{item.content}</Text>
+          <View style={styles.detailRow}>
+            <Text style={styles.detailText}>현장기사</Text>
             <View style={styles.dottedLine}></View>
-            <Text style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.5)" }}>
-              {item.reg_date}
-            </Text>
+            <Text style={styles.detailText}>{item.reg_date}</Text>
             <View style={styles.dottedLine}></View>
-            <Text style={{ fontSize: 14, color: "rgba(0, 0, 0, 0.5)" }}>
-              조회수: {item.view_cnt}
-            </Text>
+            <Text style={styles.detailText}>조회수: {item.view_cnt}</Text>
             <View style={styles.dottedLine}></View>
-            <Image
-              source={icons.img}
-              resizeMode="contain"
-              style={{ width: 16, height: 16 }}
-            />
+            <Image source={icons.img} resizeMode="contain" style={{ width: 16, height: 16 }} />
           </View>
 
           <View style={{ marginTop: 16 }}>
             <Button
               title="확인"
-              handlePress={() =>
-                navigation.navigate('ErrorFixDetailScreen', { id: item.device_error_fix_seq })
-              }
+              handlePress={() => navigation.navigate('ErrorFixDetailScreen', { id: item.device_error_fix_seq })}
               containerStyles={styles.blackButton}
               textStyles={styles.blackButtonText}
             />
@@ -157,54 +122,26 @@ const ErrorFixListScreen = () => {
         <TabNavigator title="등록" routePath="/error-fix/regist" />
       </View>
       <Text style={styles.headerText}>장비알람 설정</Text>
-      <Text style={styles.subHeaderText}>
-        현재까지 문제가 발생하여 조치한 내용들을 확인할 수 있습니다.
-      </Text>
+      <Text style={styles.subHeaderText}>현재까지 문제가 발생하여 조치한 내용들을 확인할 수 있습니다.</Text>
       <View style={styles.searchBox}>
         <View style={styles.inpBox}>
-          <TouchableOpacity
-            style={styles.selectInput}
-            onPress={handleDropdownToggle}
-          >
+          <TouchableOpacity style={styles.selectInput} onPress={handleDropdownToggle}>
             <Text style={styles.selectText}>{selectedOption}</Text>
-            <Image
-              source={icons.down02}
-              style={[styles.arrowIcon, dropdownOpen && styles.arrowIconOpen]}
-            />
+            <Image source={icons.down02} style={[styles.arrowIcon, dropdownOpen && styles.arrowIconOpen]} />
           </TouchableOpacity>
           {dropdownOpen && (
             <View style={styles.dropdown}>
               <TouchableOpacity
-                style={[
-                  styles.dropdownItem,
-                  selectedOption === "제목" && styles.selectedItem,
-                ]}
+                style={[styles.dropdownItem, selectedOption === "제목" && styles.selectedItem]}
                 onPress={() => handleOptionSelect("제목")}
               >
-                <Text
-                  style={[
-                    styles.dropdownItemText,
-                    selectedOption === "제목" && styles.selectedItemText,
-                  ]}
-                >
-                  제목
-                </Text>
+                <Text style={[styles.dropdownItemText, selectedOption === "제목" && styles.selectedItemText]}>제목</Text>
               </TouchableOpacity>
               <TouchableOpacity
-                style={[
-                  styles.dropdownItem,
-                  selectedOption === "내용" && styles.selectedItem,
-                ]}
+                style={[styles.dropdownItem, selectedOption === "내용" && styles.selectedItem]}
                 onPress={() => handleOptionSelect("내용")}
               >
-                <Text
-                  style={[
-                    styles.dropdownItemText,
-                    selectedOption === "내용" && styles.selectedItemText,
-                  ]}
-                >
-                  내용
-                </Text>
+                <Text style={[styles.dropdownItemText, selectedOption === "내용" && styles.selectedItemText]}>내용</Text>
               </TouchableOpacity>
             </View>
           )}
@@ -221,10 +158,7 @@ const ErrorFixListScreen = () => {
             <Text style={styles.buttonText}>검색</Text>
           </TouchableOpacity>
           {searchActive && (
-            <TouchableOpacity
-              style={styles.resetButton}
-              onPress={handleResetSearch}
-            >
+            <TouchableOpacity style={styles.resetButton} onPress={handleResetSearch}>
               <Text style={styles.buttonText}>검색 초기화</Text>
             </TouchableOpacity>
           )}
@@ -235,18 +169,11 @@ const ErrorFixListScreen = () => {
         style={{ marginTop: 16 }}
         renderItem={renderItem}
         keyExtractor={(item) => item.device_error_fix_seq.toString()}
-        ListEmptyComponent={
-          <Text style={styles.emptyText}>No results found</Text>
-        }
+        ListEmptyComponent={<Text style={styles.emptyText}>No results found</Text>}
       />
       {displayedData.length < resData.length && (
         <View style={styles.buttonWrapper}>
-          <Button
-            title="더보기"
-            handlePress={loadMore}
-            containerStyles={styles.transparentButton}
-            textStyles={styles.buttonText}
-          />
+          <Button title="더보기" handlePress={loadMore} containerStyles={styles.transparentButton} textStyles={styles.buttonText} />
         </View>
       )}
     </ScrollView>
@@ -381,7 +308,7 @@ const styles = StyleSheet.create({
   transparentButton: {
     borderWidth: 1,
     borderColor: "#fff",
-    padding: 8,
+    padding: 12,
     borderRadius: 8,
     backgroundColor: "transparent",
     width: 130,

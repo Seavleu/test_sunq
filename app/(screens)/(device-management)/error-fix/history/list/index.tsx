@@ -1,42 +1,65 @@
-import React, { useEffect, useState } from "react";
-import {View,Text,TextInput,FlatList,StyleSheet,ScrollView,Image,TouchableOpacity, Alert} from "react-native";
+import React, { useState } from "react";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+} from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { images, icons } from "@/constants";
 import Button from "@/components/Button";
 import TabNavigator from "@/components/TabNavigator";
 import theme from "@/constants/theme";
-import { DEVICE_API } from "@/service/api/apis";
+import { createStackNavigator } from '@react-navigation/stack';
+
+
 
 const ErrorFixListScreen = () => {
-  const [resData, setResData] = useState([]);
-  const [displayedData, setDisplayedData] = useState([]);  
+  type RootStackParamList = {
+    ErrorFixListScreen: undefined;
+    ErrorFixDetailScreen: { id: number };
+  };
+  
+  const Stack = createStackNavigator<RootStackParamList>();
+
+  const staticData = [
+    {
+      device_error_fix_seq: 1,
+      device_type: "INVERTER",
+      title: "2024-01-30 - 인버터4 AC 출력 과전류",
+      content: "인버터4의 AC 출력 과전류 발생으로 인한 시스템 정지. 인버터 점검 및 과부하 원인 파악 후 해결.",
+      reg_date: "2023-08-30 14:00",
+      view_cnt: 138,
+    },
+    {
+      device_error_fix_seq: 2,
+      device_type: "INVERTER",
+      title: "2024-01-30 - 인버터4 AC 출력 과전류",
+      content: "인버터4의 AC 출력 과전류 발생으로 인한 시스템 정지. 인버터 점검 및 과부하 원인 파악 후 해결.",
+      reg_date: "2023-07-25 10:30",
+      view_cnt: 87,
+    },
+    {
+      device_error_fix_seq: 3,
+      device_type: "INVERTER",
+      title: "2024-01-30 - 인버터4 AC 출력 과전류",
+      content: "인버터4의 AC 출력 과전류 발생으로 인한 시스템 정지. 인버터 점검 및 과부하 원인 파악 후 해결.",
+      reg_date: "2023-09-10 09:15",
+      view_cnt: 45,
+    },
+  ];
+
+  const [resData] = useState(staticData);
+  const [displayedData, setDisplayedData] = useState(staticData.slice(0, 2)); // Limit to 2 items initially
   const [searchText, setSearchText] = useState("");
   const [searchActive, setSearchActive] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
   const [selectedOption, setSelectedOption] = useState("제목");
   const navigation = useNavigation();
-  const [isLoading, setIsLoading] = useState(true);
- 
-  useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const response = await DEVICE_API.getErrorFixList({});
-        if (response.data && response.data.length > 0) {
-          setResData(response.data);
-          setDisplayedData(response.data.slice(0, 2));  
-        } else {
-          Alert.alert("No data found", "No error fixes found.");
-        }
-      } catch (error) {
-        console.error("Failed to fetch error fixes:", error);
-        Alert.alert("Error", "Failed to fetch data.");
-      } finally {
-        setIsLoading(false);
-      }
-    };
-
-    fetchData();
-  }, []);
 
   const handleSearch = () => {
     if (searchText.length > 1) {
@@ -44,7 +67,7 @@ const ErrorFixListScreen = () => {
         (item) =>
           item.title.includes(searchText) || item.content.includes(searchText)
       );
-      setDisplayedData(filtered.slice(0, 2));  
+      setDisplayedData(filtered.slice(0, 2)); // Limit to 2 items initially
       setSearchActive(true);
     } else {
       alert("검색어를 최소 2자 이상 입력해 주세요.");
@@ -116,9 +139,7 @@ const ErrorFixListScreen = () => {
             <Button
               title="확인"
               handlePress={() =>
-                navigation.navigate("DetailScreen", {
-                  id: item.device_error_fix_seq,
-                })
+                navigation.navigate('ErrorFixDetailScreen', { id: item.device_error_fix_seq })
               }
               containerStyles={styles.blackButton}
               textStyles={styles.blackButtonText}
@@ -133,7 +154,7 @@ const ErrorFixListScreen = () => {
     <ScrollView style={styles.container}>
       <View style={styles.tabContainer}>
         <TabNavigator title="이력" routePath="/error-fix/history/list" />
-        <TabNavigator title="등록" routePath="/error-fix/history/detail/" />
+        <TabNavigator title="등록" routePath="/error-fix/regist" />
       </View>
       <Text style={styles.headerText}>장비알람 설정</Text>
       <Text style={styles.subHeaderText}>
@@ -215,16 +236,18 @@ const ErrorFixListScreen = () => {
         renderItem={renderItem}
         keyExtractor={(item) => item.device_error_fix_seq.toString()}
         ListEmptyComponent={
-          <Text>No results found</Text>
+          <Text style={styles.emptyText}>No results found</Text>
         }
       />
       {displayedData.length < resData.length && (
-        <Button
-          title="더보기"
-          handlePress={loadMore}
-          containerStyles={styles.transparentButton}
-          textStyles={styles.buttonText}
-        />
+        <View style={styles.buttonWrapper}>
+          <Button
+            title="더보기"
+            handlePress={loadMore}
+            containerStyles={styles.transparentButton}
+            textStyles={styles.buttonText}
+          />
+        </View>
       )}
     </ScrollView>
   );
@@ -247,14 +270,14 @@ const styles = StyleSheet.create({
     marginBottom: 10,
   },
   subHeaderText: {
-    color: "#7B7B8B",
+    color: "#fff",
     fontSize: 16,
     marginBottom: 20,
   },
   searchBox: {
     backgroundColor: "rgba(0, 0, 0, 0.1)",
     borderRadius: 12,
-    padding: 12,
+    padding: 20,
   },
   inpBox: {
     flexDirection: "row",
@@ -270,7 +293,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    zIndex: 10, // Ensure this is in front when dropdown is open
+    zIndex: 10,
   },
   selectText: {
     color: "#FFF",
@@ -291,7 +314,7 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#FFF",
     borderRadius: 8,
-    zIndex: 20, // Increase zIndex to ensure it’s above other elements
+    zIndex: 20,
   },
   dropdownItem: {
     padding: 10,
@@ -323,20 +346,20 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     backgroundColor: "#111111",
-    padding: 10,
+    padding: 16,
     borderRadius: 8,
     flex: 1,
     marginRight: 8,
   },
   resetButton: {
     backgroundColor: "#474747",
-    padding: 10,
+    padding: 16,
     borderRadius: 8,
     flex: 1,
   },
   card: {
     backgroundColor: "#FFF",
-    padding: 16,
+    padding: 18,
     borderRadius: 8,
     marginBottom: 16,
     flexDirection: "row",
@@ -344,12 +367,16 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dottedLine: {
-    width: 1,
-    height: 14, // Adjust the height to match the text
+    width: 2,
+    height: 14,
     borderLeftWidth: 1,
     borderLeftColor: "rgba(255, 255, 255, 0.5)",
     borderStyle: "dotted",
-    transform: [{ rotate: "90deg" }], // Rotate to make it horizontal
+    transform: [{ rotate: "90deg" }],
+  },
+  buttonWrapper: {
+    alignItems: "center",
+    marginVertical: 16,
   },
   transparentButton: {
     borderWidth: 1,
@@ -357,7 +384,8 @@ const styles = StyleSheet.create({
     padding: 8,
     borderRadius: 8,
     backgroundColor: "transparent",
-    marginTop: 16,
+    width: 130,
+    height: 44,
   },
   buttonText: {
     color: "#fff",

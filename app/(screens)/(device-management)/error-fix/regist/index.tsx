@@ -1,42 +1,43 @@
-import React, { useRef, useState } from "react";
-import {
-  View,
-  Text,
-  TextInput,
-  TouchableOpacity,
-  StyleSheet,
-  ScrollView,
-  Alert,
-  Modal,
-  FlatList,
-  TouchableWithoutFeedback,
-  Image, 
-} from "react-native";
+import React, { useState, useEffect, useRef } from "react";
+import { View, Text, TextInput, FlatList, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback } from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
-import * as DocumentPicker from "expo-document-picker"; 
-
-import { icons, images } from "@/constants";
-import theme from "@/constants/theme";
-import { useRouter } from "expo-router";
+import * as DocumentPicker from "expo-document-picker";
+import { DEVICE_API } from "@/service/api/apis";
+import userStore from "@/stores/userStore"; 
 import TabNavigator from "@/components/TabNavigator";
+import { images, icons } from "@/constants";
+import theme from "@/constants/theme";
 
 const ErrorFixRegistScreen = () => {
-  const router = useRouter();
+  const navigation = useNavigation();
   const [selectTitle, setSelectTitle] = useState("");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [files, setFiles] = useState([]);
+  const [deviceErrList, setDeviceErrList] = useState([]);
   const [reqData, setReqData] = useState({
     device_error_seq: null,
-    title: "",
-    content: "",
+    title: null,
+    content: null,
     file_seq_list: [],
+    plant_seq: userStore.userInfo?.plant_seq,
+    reg_user_seq: userStore.userInfo?.user_seq
   });
 
-  const staticDeviceErrList = [
-    { device_error_seq: 1, title: "2024-01-30 - 인버터4 AC 출력 과전류" },
-    { device_error_seq: 2, title: "2024-01-30 - 인버터3 DC-LINK 센싱 불량" },
-  ];
+  useEffect(() => {
+    const fetchData = async () => {
+      try {
+        const res = await DEVICE_API.getErrorFixTitleList({
+          plant_seq: userStore.userInfo?.plant_seq
+        });
+        setDeviceErrList(res.data.list || []);
+      } catch (e) {
+        console.log("Error in ErrorFix Regist fetchData", e);
+      }
+    };
+    fetchData();
+  }, []);
 
   const handleTitleSelect = (item) => {
     setSelectTitle(item.title);
@@ -61,7 +62,6 @@ const ErrorFixRegistScreen = () => {
     console.log("제출된 데이터:", reqData);
   };
 
-  // Handle File Section
   const handleFileSelection = async () => {
     Alert.alert(
       "파일 유형 선택",
@@ -104,8 +104,10 @@ const ErrorFixRegistScreen = () => {
   };
 
   const handleAddFile = () => {
-    setFiles([...files, selectedFile]);
-    setSelectedFile(null);
+    if (selectedFile) {
+      setFiles([...files, selectedFile]);
+      setSelectedFile(null);
+    }
   };
 
   const handleCancelFile = () => {
@@ -116,7 +118,6 @@ const ErrorFixRegistScreen = () => {
     setFiles(files.filter((_, i) => i !== index));
   };
 
-  // Input Focus
   const titleInputRef = useRef(null);
   const contentInputRef = useRef(null);
 
@@ -130,42 +131,25 @@ const ErrorFixRegistScreen = () => {
       style: styles.input,
     });
   };
-  const navigateChart = () => {
-    router.replace("/");
-  };
+
   return (
     <ScrollView style={styles.container}>
       <View style={styles.tabContainer}>
         <TabNavigator title="이력" routePath="/error-fix/history/list" />
-        <TabNavigator title="등록" routePath="/" />
+        <TabNavigator title="등록" routePath="/error-fix/regist" />
       </View>
       <Text style={styles.title}>문제조치 등록</Text>
       <Text style={styles.subtitle}>
         문제가 발생하여 조치한 내용을 현장 사진과 함께 등록해 주세요.
-      </Text> 
+      </Text>
       <View style={styles.formGroup}>
         <TouchableOpacity
           style={[styles.input, dropdownVisible && styles.inputFocused]}
           onPress={() => setDropdownVisible(true)}
         >
-          <View
-            style={{
-              flexDirection: "row",
-              justifyContent: "space-between",
-              alignItems: "center",
-            }}
-          >
-            <Text style={styles.inputText}>
-              {selectTitle || "장치상태 선택"}
-            </Text>
-            <Image
-              source={icons.down02}
-              resizeMode="contain"
-              style={[
-                styles.arrowIcon,
-                dropdownVisible && styles.arrowIconOpen,
-              ]}
-            />
+          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
+            <Text style={styles.inputText}>{selectTitle || "장치상태 선택"}</Text>
+            <Image source={icons.down02} resizeMode="contain" style={[styles.arrowIcon, dropdownVisible && styles.arrowIconOpen]} />
           </View>
         </TouchableOpacity>
 
@@ -180,7 +164,7 @@ const ErrorFixRegistScreen = () => {
           </TouchableWithoutFeedback>
           <View style={styles.modalContent}>
             <FlatList
-              data={staticDeviceErrList}
+              data={deviceErrList}
               keyExtractor={(item) => item.device_error_seq.toString()}
               renderItem={({ item }) => (
                 <TouchableOpacity
@@ -217,27 +201,17 @@ const ErrorFixRegistScreen = () => {
         />
       </View>
 
-      {/* Image Attachment Section */}
       <View style={styles.attachmentContainer}>
         <Text style={styles.attachmentTitle}>현장사진 첨부</Text>
-        <Text style={styles.attachmentSubtitle}>
-          현장사진은 최대 10장까지 등록 가능합니다.
-        </Text>
-        <Image
-          source={images.dottedLine}
-          style={styles.dottedLine}
-          resizeMode="contain"
-        />
+        <Text style={styles.attachmentSubtitle}>현장사진은 최대 10장까지 등록 가능합니다.</Text>
+        <Image source={images.dottedLine} style={styles.dottedLine} resizeMode="contain" />
 
         {files.map((file, index) => (
           <View key={index} style={styles.fileRow}>
             <Text style={styles.selectedFileText}>
               {file.name || file.uri.split("/").pop()}
             </Text>
-            <TouchableOpacity
-              style={styles.deleteButton}
-              onPress={() => handleDeleteFile(index)}
-            >
+            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteFile(index)}>
               <Text style={styles.deleteButtonText}>삭제</Text>
             </TouchableOpacity>
           </View>
@@ -247,30 +221,18 @@ const ErrorFixRegistScreen = () => {
           style={styles.fileInput}
           placeholder="파일을 등록해주세요."
           placeholderTextColor="#7B7B8B"
-          value={
-            selectedFile?.name || selectedFile?.uri?.split("/").pop() || ""
-          }
+          value={selectedFile?.name || selectedFile?.uri?.split("/").pop() || ""}
           editable={false}
         />
 
         <View style={styles.addCancelButtons}>
-          <TouchableOpacity
-            style={styles.selectFileButton}
-            onPress={handleFileSelection}
-          >
+          <TouchableOpacity style={styles.selectFileButton} onPress={handleFileSelection}>
             <Text style={styles.selectFileButtonText}>파일 찾기</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleAddFile}
-            disabled={!selectedFile}
-          >
+          <TouchableOpacity style={styles.addButton} onPress={handleAddFile} disabled={!selectedFile}>
             <Text style={styles.addButtonText}>추가</Text>
           </TouchableOpacity>
-          <TouchableOpacity
-            style={styles.addButton}
-            onPress={handleCancelFile}
-          >
+          <TouchableOpacity style={styles.addButton} onPress={handleCancelFile}>
             <Text style={styles.addButtonText}>삭제</Text>
           </TouchableOpacity>
         </View>
@@ -292,6 +254,8 @@ const ErrorFixRegistScreen = () => {
     </ScrollView>
   );
 };
+
+ 
 
 const commonButtonStyle = {
   paddingVertical: 10,

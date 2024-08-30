@@ -2,16 +2,24 @@ import { useEffect, useState } from "react";
 import {
   View,
   Text,
-  Image,
-  TouchableOpacity,
+  Image, 
   StyleSheet,
   ScrollView,
   Modal, 
 } from "react-native";
-import { useRoute, useNavigation } from "@react-navigation/native";
+import { RouteProp ,useRoute, useNavigation } from "@react-navigation/native";
 import { DEVICE_API } from "@/service/api/apis";
 import { icons, images } from "@/constants";
 import Button from "@/components/Button";
+
+type RootStackParamList = {
+  ErrorFixDetailScreen: { id: number };
+};
+
+type ErrorFixDetailScreenRouteProp = RouteProp<RootStackParamList, 'ErrorFixDetailScreen'>;
+
+const route = useRoute<ErrorFixDetailScreenRouteProp>();
+const { id } = route.params;
 
 const ErrorFixDetailScreen = () => {
   const [resData, setResData] = useState(null);
@@ -19,26 +27,26 @@ const ErrorFixDetailScreen = () => {
   const [fileList, setFileList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);  
   const [selectedImage, setSelectedImage] = useState(null);  
-  const route = useRoute();
-  const navigation = useNavigation();
-  const { id } = route.params;
 
-  useEffect(() => {
-    fetchData();
-  }, [id]);
 
-  const fetchData = async () => {
-    try {
-      const response = await DEVICE_API.getErrorFixDetail({
-        device_error_fix_seq: id,
-      });
-      setResData(response.data);
-      setTitle(response.data.title);
-      setFileList(response.data.file_list || []);
-    } catch (error) {
-      console.error("Error fetching detail:", error);
-    }
-  };
+useEffect(() => {
+  console.log("Navigated with ID:", id);
+  fetchData();
+}, [id]);
+
+const fetchData = async () => {
+  try {
+    const response = await DEVICE_API.getErrorFixDetail({
+      device_error_fix_seq: id,
+    });
+    setResData(response.data);
+    setTitle(response.data.title);
+    setFileList(response.data.file_list || []);
+  } catch (error) {
+    console.error("Error fetching detail:", error);
+  }
+};
+
 
   return (
     <ScrollView style={styles.container}>

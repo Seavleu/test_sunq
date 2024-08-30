@@ -71,7 +71,7 @@ export interface GetInspectionListRequest {
     plant_seq: string;
     query_search: string;
     query_value: string;
-    page: string;
+    page: number;
 }
 
 export interface GetInspectionDetailRequest {
@@ -134,7 +134,7 @@ export interface GetErrorFixListRequest {
     plant_seq: string;
     query_search: string;
     query_value: string;
-    page: string;
+    page: number;
 }
 
 export interface GetErrorFixTitleListRequest {
@@ -149,7 +149,7 @@ export interface GetErrorAlarmListRequest {
     plant_seq: string;
     start_date: string;
     end_date: string;
-    page: string;
+    page: number;
 }
 
 declare type TabNavigatorProps = {

@@ -1,7 +1,7 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, SafeAreaView, Alert, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import * as SecureStore from 'expo-secure-store';
 
 import Button from '@/components/Button';
 import FormField from '@/components/FormField';
@@ -23,27 +23,25 @@ const LoginScreen = () => {
   useEffect(() => {
     const loadSettings = async () => {
       try {
-        const savedId = await AsyncStorage.getItem('savedId');
-        const autoLoginFlag = await AsyncStorage.getItem('autoLoginFlag');
-        const token = await AsyncStorage.getItem('authToken');
+        const savedId = await SecureStore.getItemAsync('savedId');
+        const autoLoginFlag = await SecureStore.getItemAsync('autoLoginFlag');
+        const token = await SecureStore.getItemAsync('authToken');
 
         if (savedId) {
           setForm(prev => ({ ...prev, id: savedId }));
-          console.log('Saved ID retrieved:', savedId);
-
           setSaveId(true);
+          console.log('Saved ID retrieved:', savedId);
         } else {
-          console.log('No saved ID found')
+          console.log('No saved ID found');
         }
 
-        if (autoLoginFlag && token) {
+        if (autoLoginFlag === 'true' && token) {
           setAutoLogin(true);
-          console.log('Token retrieved securely:', token)
           userStore.setToken(token);
-
           await handleAutoLogin();
         } else if (token) {
           userStore.setToken(token);
+        } else {
           console.log('No token found in SecureStore.');
         }
       } catch (error) {
@@ -69,32 +67,26 @@ const LoginScreen = () => {
         sun_q_a_t: '',
       });
 
-      console.log('Attempting login with', response);
-
       if (response.data.result === 0) {
         const { token } = response.data.data;
 
-        // console.log('API Response:', response.data); 
-
         if (saveId || autoLogin) {
-          await AsyncStorage.setItem('savedId', form.id);
+          await SecureStore.setItemAsync('savedId', form.id);
         } else {
-          await AsyncStorage.removeItem('savedId');
+          await SecureStore.deleteItemAsync('savedId');
         }
 
         if (autoLogin) {
-          await AsyncStorage.setItem('authToken', token);
-          await AsyncStorage.setItem('savedPassword', form.pw);
-          await AsyncStorage.setItem('autoLoginFlag', 'true');
+          await SecureStore.setItemAsync('authToken', token);
+          await SecureStore.setItemAsync('savedPassword', form.pw);
+          await SecureStore.setItemAsync('autoLoginFlag', 'true');
         } else {
-          await AsyncStorage.removeItem('autoLoginFlag');
-          await AsyncStorage.removeItem('authToken');
-          await AsyncStorage.removeItem('savedPassword');
+          await SecureStore.deleteItemAsync('autoLoginFlag');
+          await SecureStore.deleteItemAsync('authToken');
+          await SecureStore.deleteItemAsync('savedPassword');
         }
 
         userStore.setToken(token);
-        console.log('User Store Token:', userStore.token);
-
         router.replace('/(device-management)/error-fix/history/list');
       } else {
         setError(response.data.message);
@@ -109,9 +101,9 @@ const LoginScreen = () => {
 
   const handleAutoLogin = async () => {
     try {
-      const savedId = await AsyncStorage.getItem('savedId');
-      const savedPassword = await AsyncStorage.getItem('savedPassword');
-      const token = await AsyncStorage.getItem('authToken');
+      const savedId = await SecureStore.getItemAsync('savedId');
+      const savedPassword = await SecureStore.getItemAsync('savedPassword');
+      const token = await SecureStore.getItemAsync('authToken');
 
       if (savedId && savedPassword && token) {
         const response = await LOGIN_API.autoLogin({

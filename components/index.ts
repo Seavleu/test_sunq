@@ -3,11 +3,15 @@ import Button from "./Button";
 import TabNavigator from "./TabNavigator";
 import LogoutButton from "./LogoutButton";
 import FormField from "./FormField";
+import AlertBox from "./AlertBox";
+import CustomCheckBox from "./CheckBox";
 
-export default {
+export {
     Header,
     Button, 
     TabNavigator,
     LogoutButton,
-    FormField
+    FormField,
+    AlertBox,
+    CustomCheckBox
 }

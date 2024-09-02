@@ -5,7 +5,7 @@ import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import { DEVICE_API } from "@/service/api/apis";
 import userStore from "@/stores/userStore"; 
-import TabNavigator from "@/components/TabNavigator";
+import {TabNavigator} from "@/components";
 import { images, icons } from "@/constants";
 import theme from "@/constants/theme";
 

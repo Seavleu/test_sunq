@@ -11,8 +11,7 @@ import {
 } from "react-native";
 import { useNavigation } from "@react-navigation/native";
 import { images, icons } from "@/constants";
-import Button from "@/components/Button";
-import TabNavigator from "@/components/TabNavigator";
+import {Button, TabNavigator} from "@/components"; 
 import theme from "@/constants/theme";
 
 const ErrorFixListScreen = () => {

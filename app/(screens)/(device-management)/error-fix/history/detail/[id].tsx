@@ -3,8 +3,7 @@ import { View, Text, Image, StyleSheet, ScrollView, Modal } from "react-native";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { DEVICE_API } from "@/service/api/apis";
 import { icons, images } from "@/constants";
-import Button from "@/components/Button";
-import TabNavigator from "@/components/TabNavigator";
+import {Button, TabNavigator} from "@/components";
 import theme from "@/constants/theme";
 
 const ErrorFixDetailScreen = () => {

@@ -3,10 +3,7 @@ import { View, Text, TouchableOpacity, Image, ScrollView, Dimensions, Modal, Saf
 import { useRouter } from 'expo-router';
 import * as SecureStore from 'expo-secure-store';
 
-import Button from '@/components/Button';
-import FormField from '@/components/FormField';
-import AlertBox from '@/components/AlertBox';
-import CustomCheckBox from '@/components/CheckBox';
+import {Button, FormField, AlertBox, CustomCheckBox} from '@/components'; 
 
 import { images } from '@/constants';
 import { LOGIN_API } from '@/service/api/apis';

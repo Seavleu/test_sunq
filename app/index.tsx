@@ -3,7 +3,7 @@ import { View, Text, StyleSheet } from 'react-native';
 import { observer } from 'mobx-react-lite';
 import userStore from '../stores/userStore';
 import { Link, useRouter } from 'expo-router';
-import LogoutButton from '@/components/LogoutButton';
+import {LogoutButton} from '@/components';
 import theme from '@/constants/theme';
 
 const HomeScreen = observer(() => {

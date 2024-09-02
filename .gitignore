@@ -23,5 +23,4 @@ expo-env.d.ts
 # Local Env files
 .env*.development
 
-.env*.d.ts
-.env.d.ts
+.env*.d.ts 

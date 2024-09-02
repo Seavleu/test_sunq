@@ -1,6 +1,6 @@
-import React, { createContext, useContext, useEffect, useState, ReactNode } from 'react';
-import apiClient from '@/service/api/config';  
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import React, { createContext, useContext, useState, ReactNode, useLayoutEffect } from 'react';
+import api from '@/service/api/config';
+import userStore from '@/stores/userStore';  
 
 interface User {
   user_id: string;
@@ -35,20 +35,26 @@ const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
   const [user, setUser] = useState<User | null>(null);
   const [loading, setLoading] = useState<boolean>(true);
 
-  useEffect(() => {
-    const checkCurrentUser = async () => {
+  useLayoutEffect(() => {
+    const initializeAuth = async () => {
+      await userStore.loadToken(); // Load token from secure store
+      if (userStore.token) {
+        api.defaults.headers.common['Authorization'] = `Bearer ${userStore.token}`;
+        await fetchCurrentUser();
+      } else {
+        setIsLogged(false);
+        setUser(null);
+        setLoading(false);
+      }
+    };
+
+    const fetchCurrentUser = async () => {
       try {
-        const token = await AsyncStorage.getItem('authToken');
-        if (token) {
-          apiClient.defaults.headers.common['Authorization'] = `Bearer ${token}`;
-          const response = await apiClient.get<User>('/api/current-user');
-          if (response.data) {
-            setIsLogged(true);
-            setUser(response.data);
-          } else {
-            setIsLogged(false);
-            setUser(null);
-          }
+        const response = await api.get<User>('/api/user/me');
+        if (response.data) {
+          setIsLogged(true);
+          setUser(response.data);
+          await userStore.setUserInfo(response.data); // Store user info securely
         } else {
           setIsLogged(false);
           setUser(null);
@@ -62,7 +68,51 @@ const GlobalProvider: React.FC<GlobalProviderProps> = ({ children }) => {
       }
     };
 
-    checkCurrentUser();
+    initializeAuth();
+  }, []);
+
+  useLayoutEffect(() => {
+    const authInterceptor = api.interceptors.request.use((config) => {
+      const token = userStore.token;
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+      return config;
+    });
+
+    return () => {
+      api.interceptors.request.eject(authInterceptor);
+    };
+  }, []);
+
+  useLayoutEffect(() => {
+    const refreshInterceptor = api.interceptors.response.use(
+      (response) => response,
+      async (error) => {
+        const originalRequest = error.config;
+        if (
+          error.response.status === 403 &&
+          error.response.data.message === 'Unauthorized'
+        ) {
+          try {
+            const response = await api.get('/api/refreshToken');
+            const newToken = response.data.accessToken;
+            await userStore.setToken(newToken); // Store the new token securely
+            originalRequest.headers.Authorization = `Bearer ${newToken}`;
+            return api(originalRequest);
+          } catch (refreshError) {
+            await userStore.logout(); // Clear token and user info securely
+            setIsLogged(false);
+            setUser(null);
+          }
+        }
+        return Promise.reject(error);
+      }
+    );
+
+    return () => {
+      api.interceptors.response.eject(refreshInterceptor);
+    };
   }, []);
 
   return (

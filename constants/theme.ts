@@ -10,6 +10,7 @@ const theme = {
     white: '#ffffff',
     black: '#000000',
     link: '#0a7ea4',
+    gray: '#999999'
   },
   spacing: {
     small: 8,

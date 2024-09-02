@@ -1,19 +1,9 @@
 import React, { useState } from "react";
 import styles from "./styles";
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-} from "react-native";
-import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
+import {View,Text,TextInput,FlatList, ScrollView,Image,TouchableOpacity} from "react-native";
+import { useNavigation } from "@react-navigation/native";
 import { images, icons } from "@/constants";
-import { Button, TabNavigator } from "@/components";
-import theme from "@/constants/theme";
+import { Button, TabNavigator } from "@/components"; 
 import errorFixList from "@/constants/errorFixList";
 
 const ErrorFixListScreen = () => {

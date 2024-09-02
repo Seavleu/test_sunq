@@ -30,20 +30,20 @@ api.interceptors.response.use(
 
     if (error.response.status === 401 || error.response.status === 403) {
       try {
-        // Attempt to refresh the token
+       // 토큰 새로 고침 시도
         const refreshResponse = await api.get('/api/refreshToken');
         const newToken = refreshResponse.data.accessToken;
 
-        // Store the new token securely
+        // 새 토큰 저장
         await userStore.setToken(newToken);
 
-        // Retry the original request with the new token
+        // 새 토큰으로 원래 요청 재시도
         originalRequest.headers.Authorization = `Bearer ${newToken}`;
         return api(originalRequest);
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
 
-        // If refresh fails, logout the user
+        // 새로 고침에 실패할 경우 사용자 로그아웃
         await userStore.logout();
         console.log('Logged out due to token refresh failure.');
         return Promise.reject(refreshError);

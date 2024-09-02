@@ -1,24 +1,11 @@
 import React, { useState, useEffect, useRef } from "react";
 import styles from "./styles";
-import {
-  View,
-  Text,
-  TextInput,
-  FlatList,
-  StyleSheet,
-  ScrollView,
-  Image,
-  TouchableOpacity,
-  Modal,
-  Alert,
-  TouchableWithoutFeedback,
-} from "react-native";
+import {View,Text,TextInput,FlatList, ScrollView,Image,TouchableOpacity,Modal,Alert,TouchableWithoutFeedback} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import TabNavigator from "@/components/TabNavigator";
-import { images, icons } from "@/constants";
-import theme from "@/constants/theme";
+import { images, icons } from "@/constants"; 
 import errorFixList from "@/constants/errorFixList";
 
 // Generate dynamically from errorFixList

@@ -96,10 +96,7 @@ const theme = {
     width: 1,
     height: 14,
     resizeMode: 'cover',
-  },
-  footerSpace: {
-    height: theme.spacing.xLarge,  
-  },
+  }, 
 };
 
 export default theme;

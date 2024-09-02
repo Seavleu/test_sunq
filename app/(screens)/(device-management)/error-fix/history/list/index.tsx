@@ -9,41 +9,15 @@ import {
   Image,
   TouchableOpacity,
 } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
 import { images, icons } from "@/constants";
 import {Button, TabNavigator} from "@/components"; 
 import theme from "@/constants/theme";
+import errorFixList from "@/constants/errorFixList";
 
 const ErrorFixListScreen = () => {
-  const staticData = [
-    {
-      device_error_fix_seq: 1,
-      device_type: "INVERTER",
-      title: "2024-01-30 - 인버터4 AC 출력 과전류",
-      content: "인버터4의 AC 출력 과전류 발생으로 인한 시스템 정지. 인버터 점검 및 과부하 원인 파악 후 해결.",
-      reg_date: "2023-08-30 14:00",
-      view_cnt: 138,
-    },
-    {
-      device_error_fix_seq: 2,
-      device_type: "INVERTER",
-      title: "2024-01-30 - 인버터4 AC 출력 과전류",
-      content: "인버터4의 AC 출력 과전류 발생으로 인한 시스템 정지. 인버터 점검 및 과부하 원인 파악 후 해결.",
-      reg_date: "2023-07-25 10:30",
-      view_cnt: 87,
-    },
-    {
-      device_error_fix_seq: 3,
-      device_type: "INVERTER",
-      title: "2024-01-30 - 인버터4 AC 출력 과전류",
-      content: "인버터4의 AC 출력 과전류 발생으로 인한 시스템 정지. 인버터 점검 및 과부하 원인 파악 후 해결.",
-      reg_date: "2023-09-10 09:15",
-      view_cnt: 45,
-    },
-  ];
-
-  const [resData] = useState(staticData);
-  const [displayedData, setDisplayedData] = useState(staticData.slice(0, 2)); // Limit to 2 items initially
+  const [resData] = useState(errorFixList);
+  const [displayedData, setDisplayedData] = useState(resData.slice(0, 2)); // Limit to 2 items initially
   const [searchText, setSearchText] = useState("");
   const [searchActive, setSearchActive] = useState(false);
   const [dropdownOpen, setDropdownOpen] = useState(false);
@@ -56,7 +30,7 @@ const ErrorFixListScreen = () => {
         (item) =>
           item.title.includes(searchText) || item.content.includes(searchText)
       );
-      setDisplayedData(filtered.slice(0, 2)); // Limit to 2 items initially
+      setDisplayedData(filtered.slice(0, 3)); 
       setSearchActive(true);
     } else {
       alert("검색어를 최소 2자 이상 입력해 주세요.");
@@ -65,7 +39,7 @@ const ErrorFixListScreen = () => {
 
   const handleResetSearch = () => {
     setSearchText("");
-    setDisplayedData(resData.slice(0, 2));
+    setDisplayedData(resData.slice(0, 3));
     setSearchActive(false);
   };
 
@@ -79,46 +53,73 @@ const ErrorFixListScreen = () => {
   };
 
   const loadMore = () => {
-    const newData = resData.slice(0, displayedData.length + 2);
+    const newData = resData.slice(0, displayedData.length + 3);
     setDisplayedData(newData);
   };
 
   const renderItem = ({ item }) => (
     <View style={styles.card}>
-      <View style={{ paddingVertical: 8, gap: 16 }}>
-        <Text style={styles.deviceTypeText}>{item.device_type}</Text>
-        <Image source={images.dottedLine} resizeMode="contain" style={{ width: "100%" }} />
-        <View style={{ gap: 8 }}>
-          <Text style={styles.titleText}>{item.title}</Text>
-          <Text style={styles.contentText}>{item.content}</Text>
-          <View style={styles.detailRow}>
-            <Text style={styles.detailText}>현장기사</Text>
-            <View style={styles.dottedLine}></View>
-            <Text style={styles.detailText}>{item.reg_date}</Text>
-            <View style={styles.dottedLine}></View>
-            <Text style={styles.detailText}>조회수: {item.view_cnt}</Text>
-            <View style={styles.dottedLine}></View>
-            <Image source={icons.img} resizeMode="contain" style={{ width: 16, height: 16 }} />
-          </View>
+    <View style={{ paddingVertical: 8, gap: 16 }}>
+      <Text style={styles.deviceTypeText}>{item.device_type}</Text>
+      <Image
+        source={images.dottedLine}
+        resizeMode="cover"
+        style={{ width: "100%" }}
+      />
+      <View style={{ gap: 8 }}>
+        <Text style={styles.titleText}>{item.title}</Text>
+        <Text style={styles.contentText}>{item.content}</Text>
+        <View style={styles.detailRow}>
+          <Text style={styles.detailText}>현장기사</Text>
+          <Image
+            source={images.dottedLine}
+            resizeMode="cover"
+            style={styles.dottedLine}
+          />
+          <Text style={styles.detailText}>{item.reg_date}</Text>
+          <Image
+            source={images.dottedLine}
+            resizeMode="cover"
+            style={styles.dottedLine}
+          />
+          <Text style={styles.detailText}>조회수: {item.view_cnt}</Text>
+          <Image
+            source={images.dottedLine}
+            resizeMode="cover"
+            style={styles.dottedLine}
+          />
 
-          <View style={{ marginTop: 16 }}>
-            <Button
-              title="확인"
-              handlePress={() => navigation.navigate('ErrorFixDetailScreen', { id: item.device_error_fix_seq })}
-              containerStyles={styles.blackButton}
-              textStyles={styles.blackButtonText}
+          {item.file_list && item.file_list.length > 0 && (
+            <Image
+              source={icons.img}
+              resizeMode="contain"
+              style={{ width: 16, height: 16 }}
             />
-          </View>
+          )}
+        </View>
+
+        <View style={{ marginTop: 16 }}>
+          <Button
+            title="확인"
+            handlePress={() =>
+              navigation.navigate("ErrorFixDetailScreen", {
+                id: item.device_error_fix_seq,
+              })
+            }
+            containerStyles={styles.blackButton}
+            textStyles={styles.blackButtonText}
+          />
         </View>
       </View>
     </View>
+  </View>
   );
 
   return (
     <ScrollView style={styles.container}>
       <View style={styles.tabContainer}>
-        <TabNavigator title="이력" routePath="/error-fix/history/list" />
-        <TabNavigator title="등록" routePath="/error-fix/regist" />
+        <TabNavigator title="이력" routePath="/error-fix/history/list" isActive={true} />
+        <TabNavigator title="등록" routePath="/error-fix/regist" isActive={false} />
       </View>
       <Text style={styles.headerText}>장비알람 설정</Text>
       <Text style={styles.subHeaderText}>현재까지 문제가 발생하여 조치한 내용들을 확인할 수 있습니다.</Text>
@@ -184,16 +185,19 @@ const styles = StyleSheet.create({
     padding: 16,
     backgroundColor: theme.colors.background,
     flex: 1,
+    zIndex: 1,
   },
   tabContainer: {
     flexDirection: "row",
     marginBottom: 20,
+    zIndex: 2,
   },
   headerText: {
     color: "#FFF",
     fontSize: 20,
     fontWeight: "bold",
     marginBottom: 10,
+    zIndex: 2,
   },
   subHeaderText: {
     color: "#fff",
@@ -204,10 +208,33 @@ const styles = StyleSheet.create({
     backgroundColor: "rgba(0, 0, 0, 0.1)",
     borderRadius: 12,
     padding: 20,
+    zIndex: 2,
   },
   inpBox: {
     flexDirection: "row",
     marginBottom: 10,
+    zIndex: 3,
+  },
+  deviceTypeText: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  titleText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  detailRow: {
+    flexDirection: "row",
+    gap: 18,
+  },
+  detailText: {
+    fontSize: 12,
+    color: theme.colors.gray,
   },
   selectInput: {
     flex: 1,
@@ -219,7 +246,7 @@ const styles = StyleSheet.create({
     flexDirection: "row",
     justifyContent: "space-between",
     alignItems: "center",
-    zIndex: 10,
+    zIndex: 3,
   },
   selectText: {
     color: "#FFF",
@@ -240,7 +267,8 @@ const styles = StyleSheet.create({
     right: 0,
     backgroundColor: "#FFF",
     borderRadius: 8,
-    zIndex: 20,
+    zIndex: 4,
+    elevation: 5,
   },
   dropdownItem: {
     padding: 10,
@@ -293,13 +321,10 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dottedLine: {
-    width: 2,
-    height: 14,
-    borderLeftWidth: 1,
-    borderLeftColor: "rgba(255, 255, 255, 0.5)",
-    borderStyle: "dotted",
-    transform: [{ rotate: "90deg" }],
+    width: 0.5,
+    height: 14,  
   },
+
   buttonWrapper: {
     alignItems: "center",
     marginVertical: 16,

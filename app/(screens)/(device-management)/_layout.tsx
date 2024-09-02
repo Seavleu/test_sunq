@@ -2,8 +2,8 @@ import { Stack } from 'expo-router';
 
 const DeviceManagementLayout = () => {
   return (
-    <Stack initialRouteName="(device-management)" screenOptions={{ headerShown: false }}>
-      <Stack.Screen name="(device-management)" options={{ title: 'Device Status', headerShown: false }} />
+    <Stack initialRouteName="error-list" screenOptions={{ headerShown: false }}>
+      <Stack.Screen name="error-list" options={{ title: 'Device Status', headerShown: false }} />
     </Stack>
   );
 };

@@ -1,18 +1,26 @@
-import { useEffect, useState } from "react";
-import { View, Text, Image, StyleSheet, ScrollView, Modal } from "react-native";
+import React, { useEffect, useState } from "react";
+import {
+  View,
+  Text,
+  Image,
+  StyleSheet,
+  ScrollView,
+  Modal,
+  TouchableOpacity,
+  FlatList,
+} from "react-native";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
-import { DEVICE_API } from "@/service/api/apis";
 import { icons, images } from "@/constants";
-import {Button, TabNavigator} from "@/components";
+import Button from "@/components/Button";
+import TabNavigator from "@/components/TabNavigator";
 import theme from "@/constants/theme";
+import errorFixList from "@/constants/errorFixList";
 
 const ErrorFixDetailScreen = () => {
   const [resData, setResData] = useState(null);
-  const [title, setTitle] = useState("");
-  const [fileList, setFileList] = useState([]);
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
-
+  const [currentIndex, setCurrentIndex] = useState(0);
   type RootStackParamList = {
     ErrorFixDetail: { id: number };
   };
@@ -29,21 +37,52 @@ const ErrorFixDetailScreen = () => {
 
   useEffect(() => {
     console.log("Navigated with ID:", id);
+    const fetchData = async () => {
+      // Fetch data from the JSON file based on the passed id
+      const data = errorFixList.find(
+        (item) => item.device_error_fix_seq === id
+      );
+      if (data) {
+        setResData(data);
+      } else {
+        console.error("Data not found for ID:", id);
+      }
+    };
     fetchData();
   }, [id]);
 
-  const fetchData = async () => {
-    try {
-      const response = await DEVICE_API.getErrorFixDetail({
-        device_error_fix_seq: id,
-      });
-      setResData(response.data);
-      setTitle(response.data.title);
-      setFileList(response.data.file_list || []);
-    } catch (error) {
-      console.error("Error fetching detail:", error);
+  const openModal = (index) => {
+    setSelectedImage(resData.file_list[index]);
+    setCurrentIndex(index);
+    setModalVisible(true);
+  };
+
+  const handleEdit = () => {
+    navigation.navigate("ErrorFixRegistScreen", { editData: resData });
+  };
+
+  const handlePrevImage = () => {
+    if (resData) {
+      const newIndex =
+        currentIndex === 0 ? resData.file_list.length - 1 : currentIndex - 1;
+      setSelectedImage(resData.file_list[newIndex].url);
+      setCurrentIndex(newIndex);
     }
   };
+
+  const handleNextImage = () => {
+    if (resData) {
+      const newIndex =
+        currentIndex === resData.file_list.length - 1 ? 0 : currentIndex + 1;
+      setSelectedImage(resData.file_list[newIndex].url);
+      setCurrentIndex(newIndex);
+    }
+  };
+  const renderImageItem = ({ item, index }) => (
+    <TouchableOpacity onPress={() => openModal(index)} style={styles.imageItem}>
+      <Image source={{ uri: item }} style={styles.roundedImage} />
+    </TouchableOpacity>
+  );
 
   return (
     <ScrollView style={styles.container}>
@@ -57,60 +96,76 @@ const ErrorFixDetailScreen = () => {
       </Text>
       {resData && (
         <>
-          <View style={styles.infoBox}>
-            <Text style={styles.deviceType}>{resData.device_type}</Text>
-            <Image
-              source={images.dottedLine}
-              resizeMode="contain"
-              style={{ width: "100%" }}
-            />
-            <View style={{ gap: 8 }}>
-              <Text style={styles.title}>{title}</Text>
-              <Text style={styles.content}>{resData.content}</Text>
-              <View style={styles.detailsRow}>
-                <Text style={styles.detailText}>현장기사</Text>
-                <View style={styles.dottedLine}></View>
-                <Text style={styles.detailText}>{resData.reg_date}</Text>
-                <View style={styles.dottedLine}></View>
-                <Text style={styles.detailText}>
-                  조회수: {resData.view_cnt}
-                </Text>
-                <View style={styles.dottedLine}></View>
-                <Image
-                  source={icons.img}
-                  resizeMode="contain"
-                  style={styles.icon}
-                />
-              </View>
+          <View style={styles.card}>
+            <View style={{ paddingVertical: 8, gap: 16 }}>
+              <Text style={styles.deviceTypeText}>{resData.device_type}</Text>
+              <Image
+                source={images.dottedLine}
+                resizeMode="cover"
+                style={{ width: "100%" }}
+              />
+              <View style={{ gap: 8 }}>
+                <Text style={styles.titleText}>{resData.title}</Text>
+                <Text style={styles.contentText}>{resData.content}</Text>
+                <View style={styles.detailRow}>
+                  <Text style={styles.detailText}>현장기사</Text>
+                  <Image
+                    source={images.dottedLine}
+                    resizeMode="cover"
+                    style={styles.dottedLine}
+                  />
+                  <Text style={styles.detailText}>{resData.reg_date}</Text>
+                  <Image
+                    source={images.dottedLine}
+                    resizeMode="cover"
+                    style={styles.dottedLine}
+                  />
+                  <Text style={styles.detailText}>
+                    조회수: {resData.view_cnt}
+                  </Text>
 
-              <View style={styles.buttonRow}>
-                <Button
-                  title="수정"
-                  handlePress={() => {
-                    /* handle update */
-                  }}
-                  containerStyles={styles.correctBtn}
-                  textStyles={styles.correctBtnText}
-                />
-                <Button
-                  title="삭제"
-                  handlePress={() => {
-                    /* handle delete */
-                  }}
-                  containerStyles={styles.deleteButton}
-                  textStyles={styles.deleteButtonText}
-                />
+                  {resData.file_list && resData.file_list.length > 0 && (
+                    <Image
+                      source={icons.img}
+                      resizeMode="contain"
+                      style={{ width: 16, height: 16 }}
+                    />
+                  )}
+
+                </View>
+                <View style={styles.buttonRow}>
+                  <Button
+                    title="수정"
+                    handlePress={handleEdit}
+                    containerStyles={styles.correctBtn}
+                    textStyles={styles.correctBtnText}
+                  />
+                </View>
               </View>
             </View>
           </View>
 
           <View style={styles.imageContainer}>
-            <Image
-              source={images.dottedLine}
-              resizeMode="contain"
-              style={styles.fullWidthImage}
-            />
-            {/* Render additional images here if needed */}
+            <View>
+              {/* Showing the detail of the content data here */}
+              <Image
+                source={images.dottedLine}
+                resizeMode="cover"
+                style={{ width: "100%" }}
+              />
+            </View>
+
+            {/* Horizontal ScrollView for Images */}
+            {resData.file_list && resData.file_list.length > 0 && (
+              <FlatList
+                data={resData.file_list}
+                renderItem={renderImageItem}
+                keyExtractor={(item, index) => index.toString()}
+                horizontal
+                showsHorizontalScrollIndicator={false}
+                style={styles.imageList}
+              />
+            )}
           </View>
 
           <View style={styles.buttonWrapper}>
@@ -133,10 +188,19 @@ const ErrorFixDetailScreen = () => {
           onRequestClose={() => setModalVisible(!modalVisible)}
         >
           <View style={styles.modalView}>
-            <Image
-              source={{ uri: selectedImage.uri }}
-              style={styles.modalImage}
-            />
+            <TouchableOpacity
+              onPress={handlePrevImage}
+              style={styles.arrowButton}
+            >
+              <Image source={icons.leftArrow} style={styles.arrowIcon} />
+            </TouchableOpacity>
+            <Image source={{ uri: selectedImage }} style={styles.modalImage} />
+            <TouchableOpacity
+              onPress={handleNextImage}
+              style={styles.arrowButton}
+            >
+              <Image source={icons.rightArrow} style={styles.arrowIcon} />
+            </TouchableOpacity>
             <Button
               title="닫기"
               handlePress={() => setModalVisible(false)}
@@ -171,7 +235,7 @@ const styles = StyleSheet.create({
     fontSize: 16,
     marginBottom: 20,
   },
-  infoBox: {
+  card: {
     backgroundColor: "#FFF",
     borderRadius: 8,
     padding: 20,
@@ -180,10 +244,6 @@ const styles = StyleSheet.create({
   dottedLine: {
     width: 1,
     height: 14,
-    borderLeftWidth: 1,
-    borderLeftColor: "rgba(255, 255, 255, 0.5)",
-    borderStyle: "dotted",
-    transform: [{ rotate: "90deg" }],
   },
   correctBtn: {
     backgroundColor: "#111",
@@ -193,18 +253,6 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   correctBtnText: {
-    color: "#FFF",
-    fontSize: 16,
-    fontWeight: "bold",
-  },
-  deleteButton: {
-    backgroundColor: "#E83830",
-    padding: 12,
-    borderRadius: 8,
-    flex: 1,
-    alignItems: "center",
-  },
-  deleteButtonText: {
     color: "#FFF",
     fontSize: 16,
     fontWeight: "bold",
@@ -224,22 +272,6 @@ const styles = StyleSheet.create({
     width: 130,
     height: 44,
   },
-  submitButton: {
-    backgroundColor: "#1A73E8",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-  },
-  buttonText: {
-    color: "#FFF",
-  },
-  viewImagesButton: {
-    backgroundColor: "#1A73E8",
-    padding: 12,
-    borderRadius: 8,
-    alignItems: "center",
-    marginBottom: 16,
-  },
   modalView: {
     flex: 1,
     justifyContent: "center",
@@ -247,6 +279,7 @@ const styles = StyleSheet.create({
     marginTop: 22,
     backgroundColor: "rgba(0, 0, 0, 0.5)",
     padding: 20,
+    flexDirection: "row",
   },
   modalImage: {
     width: 300,
@@ -258,6 +291,62 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     alignItems: "center",
+  },
+  deviceTypeText: {
+    textAlign: "center",
+    fontSize: 20,
+    fontWeight: "bold",
+  },
+  titleText: {
+    fontSize: 16,
+    fontWeight: "bold",
+  },
+  contentText: {
+    fontSize: 14,
+    fontWeight: "bold",
+  },
+  detailRow: {
+    flexDirection: "row",
+    gap: 18,
+  },
+  detailText: {
+    fontSize: 12,
+    color: theme.colors.gray,
+  },
+  imageContainer: {
+    backgroundColor: "transparent",
+    borderWidth: 1,
+    borderColor: theme.colors.gray,
+    borderRadius: 8,
+    padding: 20,
+    height: 200,
+    marginBottom: 20,
+  },
+  arrowButton: {
+    padding: 10,
+  },
+  arrowIcon: {
+    width: 24,
+    height: 24,
+    tintColor: "#FFF",
+  },
+  imageList: {
+    marginTop: 16,
+  },
+  roundedImage: {
+    width: 60,
+    height: 60,
+    borderRadius: 30,
+    marginRight: 10,
+  },
+  imageItem: {
+    alignItems: "center",
+    marginRight: 15,
+  },
+  imageText: {
+    color: "#FFF",
+    marginTop: 5,
+    fontSize: 12,
   },
 });
 export default ErrorFixDetailScreen;

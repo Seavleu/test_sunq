@@ -1,43 +1,55 @@
 import React, { useState, useEffect, useRef } from "react";
 import { View, Text, TextInput, FlatList, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback } from "react-native";
-import { useNavigation } from "@react-navigation/native";
+import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
-import { DEVICE_API } from "@/service/api/apis";
-import userStore from "@/stores/userStore"; 
-import {TabNavigator} from "@/components";
+import TabNavigator from "@/components/TabNavigator";
 import { images, icons } from "@/constants";
 import theme from "@/constants/theme";
+import errorFixList from '@/constants/errorFixList';  
+
+// Generate dynamically from errorFixList
+const staticDeviceErrList = errorFixList.map((item) => ({
+  device_error_seq: item.device_error_fix_seq,
+  title: item.title,
+}));
 
 const ErrorFixRegistScreen = () => {
   const navigation = useNavigation();
+  const route = useRoute();
   const [selectTitle, setSelectTitle] = useState("");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [files, setFiles] = useState([]);
-  const [deviceErrList, setDeviceErrList] = useState([]);
+  const [deviceErrList, setDeviceErrList] = useState(staticDeviceErrList);  
+
   const [reqData, setReqData] = useState({
     device_error_seq: null,
     title: null,
     content: null,
     file_seq_list: [],
-    plant_seq: userStore.userInfo?.plant_seq,
-    reg_user_seq: userStore.userInfo?.user_seq
+    plant_seq: "12345",  
+    reg_user_seq: "67890" 
   });
 
+  const dropdownButtonRef = useRef(null);
+  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+
   useEffect(() => {
-    const fetchData = async () => {
-      try {
-        const res = await DEVICE_API.getErrorFixTitleList({
-          plant_seq: userStore.userInfo?.plant_seq
-        });
-        setDeviceErrList(res.data.list || []);
-      } catch (e) {
-        console.log("Error in ErrorFix Regist fetchData", e);
-      }
-    };
-    fetchData();
-  }, []);
+    if (route.params && route.params.editData) {
+      const editData = route.params.editData;
+      setReqData({
+        device_error_seq: editData.device_error_seq,
+        title: editData.title,
+        content: editData.content,
+        file_seq_list: editData.file_list || [],
+        plant_seq: "12345",  
+        reg_user_seq: "67890" 
+      });
+      setSelectTitle(editData.title);
+      setFiles(editData.file_list || []);
+    }
+  }, [route.params]);
 
   const handleTitleSelect = (item) => {
     setSelectTitle(item.title);
@@ -58,7 +70,7 @@ const ErrorFixRegistScreen = () => {
       Alert.alert("유효성 검사 오류", "제목과 콘텐츠는 필수 입력 사항입니다.");
       return;
     }
-    Alert.alert("성공", "Registration complete with static data.");
+    Alert.alert("성공", "정적 데이터로 등록이 완료되었습니다.");
     console.log("제출된 데이터:", reqData);
   };
 
@@ -132,6 +144,12 @@ const ErrorFixRegistScreen = () => {
     });
   };
 
+  const openDropdown = () => {
+    dropdownButtonRef.current.measure((fx, fy, width, height, px, py) => {
+      setDropdownPosition({ top: py + height, left: px, width: width });
+      setDropdownVisible(true);
+    });
+  };
   return (
     <ScrollView style={styles.container}>
       <View style={styles.tabContainer}>
@@ -144,8 +162,9 @@ const ErrorFixRegistScreen = () => {
       </Text>
       <View style={styles.formGroup}>
         <TouchableOpacity
+          ref={dropdownButtonRef}
           style={[styles.input, dropdownVisible && styles.inputFocused]}
-          onPress={() => setDropdownVisible(true)}
+          onPress={openDropdown}
         >
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
             <Text style={styles.inputText}>{selectTitle || "장치상태 선택"}</Text>
@@ -162,7 +181,7 @@ const ErrorFixRegistScreen = () => {
           <TouchableWithoutFeedback onPress={() => setDropdownVisible(false)}>
             <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
-          <View style={styles.modalContent}>
+          <View style={[styles.modalContent, { top: dropdownPosition.top, left: dropdownPosition.left, width: dropdownPosition.width }]}>
             <FlatList
               data={deviceErrList}
               keyExtractor={(item) => item.device_error_seq.toString()}
@@ -207,7 +226,7 @@ const ErrorFixRegistScreen = () => {
         <Image source={images.dottedLine} style={styles.dottedLine} resizeMode="contain" />
 
         {files.map((file, index) => (
-          <View key={index} style={styles.fileRow}>
+          <View key={index} style={styles.fileRow}> 
             <Text style={styles.selectedFileText}>
               {file.name || file.uri.split("/").pop()}
             </Text>
@@ -241,12 +260,12 @@ const ErrorFixRegistScreen = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.buttonText}>
-            {reqData.device_error_seq ? "문제조치 수정" : "문제조치 등록"}
+          {reqData.device_error_seq ? "문제조치 수정" : "문제조치 등록"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
           style={styles.cancelButton}
-          onPress={() => Alert.alert("Cancelled", "Registration cancelled.")}
+          onPress={() => Alert.alert("취소됨", "등록이 취소되었습니다.")}
         >
           <Text style={styles.buttonText}>취소</Text>
         </TouchableOpacity>
@@ -254,8 +273,6 @@ const ErrorFixRegistScreen = () => {
     </ScrollView>
   );
 };
-
- 
 
 const commonButtonStyle = {
   paddingVertical: 10,
@@ -339,10 +356,8 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: 8,
     padding: 20,
-    width: "92%",
-    margin: 17,
-    top: '50%',
     position: "absolute",
+    zIndex: 1000,
   },
   dropdownItem: {
     padding: 14,
@@ -450,7 +465,6 @@ const styles = StyleSheet.create({
     width: "100%",
     gap: 10,
   },
-
   selectedFileText: {
     color: "#fff",
     backgroundColor: "#3F3F3F",

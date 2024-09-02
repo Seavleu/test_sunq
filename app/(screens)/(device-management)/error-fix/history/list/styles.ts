@@ -132,6 +132,7 @@ const styles = StyleSheet.create({
   },
   searchButton: {
     ...buttonStyles,
+    padding: 20,
     backgroundColor: "#111111",
     flex: 1,
     marginRight: theme.spacing.small,

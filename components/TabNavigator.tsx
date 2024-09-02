@@ -1,16 +1,20 @@
 import React from 'react';
-import {  Text, TouchableOpacity, StyleSheet } from 'react-native';
-import { useRouter, usePathname } from 'expo-router';
+import { Text, TouchableOpacity, StyleSheet } from 'react-native';
+import { useNavigation, useRoute } from '@react-navigation/native';
 
-const TabNavigator = ({ title, routePath }: TabNavigatorProps) => {
-  const router = useRouter();
-  const pathname = usePathname();
-  const isActive = pathname === routePath;
+const TabNavigator = ({ title, routePath }) => {
+  const navigation = useNavigation();
+  const route = useRoute();
+
+  // Determine if the current route matches the routePath or is a child of it
+  const isActive =
+    route.name === routePath ||
+    (routePath === 'ErrorFixListScreen' && route.name.startsWith('ErrorFixDetailScreen'));
 
   return (
     <TouchableOpacity
       style={[styles.tabButton, isActive && styles.activeTab]}
-      onPress={() => router.push(routePath)}
+      onPress={() => navigation.navigate(routePath)}
     >
       <Text style={isActive ? styles.tabButtonTextActive : styles.tabButtonText}>
         {title}
@@ -30,16 +34,26 @@ const styles = StyleSheet.create({
     marginHorizontal: 5,
   },
   activeTab: {
-    backgroundColor: '#E83830',  
-    borderColor: '#E83830', 
+    backgroundColor: '#E83830',
+    borderColor: '#E83830',
+    shadowColor: '#000',
+    shadowOffset: {
+      width: 0,
+      height: 2,
+    },
+    shadowOpacity: 0.25,
+    shadowRadius: 3.84,
+    elevation: 5,
   },
   tabButtonText: {
-    color: '#fff', 
+    color: '#fff',
     fontWeight: 'bold',
+    fontSize: 16,
   },
   tabButtonTextActive: {
-    color: '#fff', 
+    color: '#fff',
     fontWeight: 'bold',
+    fontSize: 18,   
   },
 });
 

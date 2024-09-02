@@ -51,4 +51,5 @@ declare type CardProps = {
 declare type TabNavigatorProps = {
   title: string;
   routePath: string;
+  highlightTab?: string
 };

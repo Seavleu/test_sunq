@@ -1,12 +1,25 @@
 import React, { useState, useEffect, useRef } from "react";
-import { View, Text, TextInput, FlatList, StyleSheet, ScrollView, Image, TouchableOpacity, Modal, Alert, TouchableWithoutFeedback } from "react-native";
+import styles from "./styles";
+import {
+  View,
+  Text,
+  TextInput,
+  FlatList,
+  StyleSheet,
+  ScrollView,
+  Image,
+  TouchableOpacity,
+  Modal,
+  Alert,
+  TouchableWithoutFeedback,
+} from "react-native";
 import { useNavigation, useRoute } from "@react-navigation/native";
 import * as ImagePicker from "expo-image-picker";
 import * as DocumentPicker from "expo-document-picker";
 import TabNavigator from "@/components/TabNavigator";
 import { images, icons } from "@/constants";
 import theme from "@/constants/theme";
-import errorFixList from '@/constants/errorFixList';  
+import errorFixList from "@/constants/errorFixList";
 
 // Generate dynamically from errorFixList
 const staticDeviceErrList = errorFixList.map((item) => ({
@@ -21,19 +34,23 @@ const ErrorFixRegistScreen = () => {
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [selectedFile, setSelectedFile] = useState(null);
   const [files, setFiles] = useState([]);
-  const [deviceErrList, setDeviceErrList] = useState(staticDeviceErrList);  
+  const [deviceErrList, setDeviceErrList] = useState(staticDeviceErrList);
 
   const [reqData, setReqData] = useState({
     device_error_seq: null,
     title: null,
     content: null,
     file_seq_list: [],
-    plant_seq: "12345",  
-    reg_user_seq: "67890" 
+    plant_seq: "12345",
+    reg_user_seq: "67890",
   });
 
   const dropdownButtonRef = useRef(null);
-  const [dropdownPosition, setDropdownPosition] = useState({ top: 0, left: 0, width: 0 });
+  const [dropdownPosition, setDropdownPosition] = useState({
+    top: 0,
+    left: 0,
+    width: 0,
+  });
 
   useEffect(() => {
     if (route.params && route.params.editData) {
@@ -43,8 +60,8 @@ const ErrorFixRegistScreen = () => {
         title: editData.title,
         content: editData.content,
         file_seq_list: editData.file_list || [],
-        plant_seq: "12345",  
-        reg_user_seq: "67890" 
+        plant_seq: "12345",
+        reg_user_seq: "67890",
       });
       setSelectTitle(editData.title);
       setFiles(editData.file_list || []);
@@ -153,8 +170,8 @@ const ErrorFixRegistScreen = () => {
   return (
     <ScrollView style={styles.container}>
       <View style={styles.tabContainer}>
-        <TabNavigator title="이력" routePath="/error-fix/history/list" />
-        <TabNavigator title="등록" routePath="/error-fix/regist" />
+        <TabNavigator title="이력" routePath="ErrorFixListScreen" />
+        <TabNavigator title="등록" routePath="ErrorFixRegistScreen" />
       </View>
       <Text style={styles.title}>문제조치 등록</Text>
       <Text style={styles.subtitle}>
@@ -166,9 +183,24 @@ const ErrorFixRegistScreen = () => {
           style={[styles.input, dropdownVisible && styles.inputFocused]}
           onPress={openDropdown}
         >
-          <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center" }}>
-            <Text style={styles.inputText}>{selectTitle || "장치상태 선택"}</Text>
-            <Image source={icons.down02} resizeMode="contain" style={[styles.arrowIcon, dropdownVisible && styles.arrowIconOpen]} />
+          <View
+            style={{
+              flexDirection: "row",
+              justifyContent: "space-between",
+              alignItems: "center",
+            }}
+          >
+            <Text style={styles.inputText}>
+              {selectTitle || "장치상태 선택"}
+            </Text>
+            <Image
+              source={icons.down02}
+              resizeMode="contain"
+              style={[
+                styles.arrowIcon,
+                dropdownVisible && styles.arrowIconOpen,
+              ]}
+            />
           </View>
         </TouchableOpacity>
 
@@ -181,7 +213,16 @@ const ErrorFixRegistScreen = () => {
           <TouchableWithoutFeedback onPress={() => setDropdownVisible(false)}>
             <View style={styles.modalOverlay} />
           </TouchableWithoutFeedback>
-          <View style={[styles.modalContent, { top: dropdownPosition.top, left: dropdownPosition.left, width: dropdownPosition.width }]}>
+          <View
+            style={[
+              styles.modalContent,
+              {
+                top: dropdownPosition.top,
+                left: dropdownPosition.left,
+                width: dropdownPosition.width,
+              },
+            ]}
+          >
             <FlatList
               data={deviceErrList}
               keyExtractor={(item) => item.device_error_seq.toString()}
@@ -222,15 +263,24 @@ const ErrorFixRegistScreen = () => {
 
       <View style={styles.attachmentContainer}>
         <Text style={styles.attachmentTitle}>현장사진 첨부</Text>
-        <Text style={styles.attachmentSubtitle}>현장사진은 최대 10장까지 등록 가능합니다.</Text>
-        <Image source={images.dottedLine} style={styles.dottedLine} resizeMode="contain" />
+        <Text style={styles.attachmentSubtitle}>
+          현장사진은 최대 10장까지 등록 가능합니다.
+        </Text>
+        <Image
+          source={images.dottedLine}
+          style={styles.dottedLine}
+          resizeMode="contain"
+        />
 
         {files.map((file, index) => (
-          <View key={index} style={styles.fileRow}> 
+          <View key={index} style={styles.fileRow}>
             <Text style={styles.selectedFileText}>
               {file.name || file.uri.split("/").pop()}
             </Text>
-            <TouchableOpacity style={styles.deleteButton} onPress={() => handleDeleteFile(index)}>
+            <TouchableOpacity
+              style={styles.deleteButton}
+              onPress={() => handleDeleteFile(index)}
+            >
               <Text style={styles.deleteButtonText}>삭제</Text>
             </TouchableOpacity>
           </View>
@@ -240,15 +290,24 @@ const ErrorFixRegistScreen = () => {
           style={styles.fileInput}
           placeholder="파일을 등록해주세요."
           placeholderTextColor="#7B7B8B"
-          value={selectedFile?.name || selectedFile?.uri?.split("/").pop() || ""}
+          value={
+            selectedFile?.name || selectedFile?.uri?.split("/").pop() || ""
+          }
           editable={false}
         />
 
         <View style={styles.addCancelButtons}>
-          <TouchableOpacity style={styles.selectFileButton} onPress={handleFileSelection}>
+          <TouchableOpacity
+            style={styles.selectFileButton}
+            onPress={handleFileSelection}
+          >
             <Text style={styles.selectFileButtonText}>파일 찾기</Text>
           </TouchableOpacity>
-          <TouchableOpacity style={styles.addButton} onPress={handleAddFile} disabled={!selectedFile}>
+          <TouchableOpacity
+            style={styles.addButton}
+            onPress={handleAddFile}
+            disabled={!selectedFile}
+          >
             <Text style={styles.addButtonText}>추가</Text>
           </TouchableOpacity>
           <TouchableOpacity style={styles.addButton} onPress={handleCancelFile}>
@@ -260,7 +319,7 @@ const ErrorFixRegistScreen = () => {
       <View style={styles.buttonContainer}>
         <TouchableOpacity style={styles.submitButton} onPress={handleSubmit}>
           <Text style={styles.buttonText}>
-          {reqData.device_error_seq ? "문제조치 수정" : "문제조치 등록"}
+            {reqData.device_error_seq ? "문제조치 수정" : "문제조치 등록"}
           </Text>
         </TouchableOpacity>
         <TouchableOpacity
@@ -270,210 +329,10 @@ const ErrorFixRegistScreen = () => {
           <Text style={styles.buttonText}>취소</Text>
         </TouchableOpacity>
       </View>
+
+      <View style={styles.footerSpace}/>
     </ScrollView>
   );
 };
-
-const commonButtonStyle = {
-  paddingVertical: 10,
-  paddingHorizontal: 20,
-  borderRadius: 8,
-  alignItems: "center",
-  justifyContent: "center",
-  flex: 1,
-  height: 50,
-};
-
-const commonTextStyle = {
-  color: "#fff",
-  fontWeight: "500",
-  fontSize: 16,
-  textAlign: "center",
-};
-
-const styles = StyleSheet.create({
-  tabContainer: {
-    flexDirection: 'row',
-    marginBottom: 20,
-  },
-  container: {
-    flexGrow: 1,
-    padding: 16,
-    backgroundColor: theme.colors.background,
-  },
-  title: {
-    fontSize: 24,
-    fontWeight: "bold",
-    color: "#fff",
-    marginBottom: 16,
-  },
-  subtitle: {
-    fontSize: 16,
-    color: "#fff",
-    marginBottom: 24,
-  },
-  formGroup: {
-    marginBottom: 24,
-  },
-  input: {
-    backgroundColor: "rgba(255, 255, 255, 0.1)",
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 16,
-    color: "#fff",
-    borderWidth: 1,
-    borderColor: "transparent",
-  },
-  resizeHandle: {
-    width: 10,
-    height: 10,
-    backgroundColor: "rgba(255, 255, 255, 0.3)",
-    position: "absolute",
-    right: 10,
-    bottom: 10,
-    transform: [{ rotate: "45deg" }],
-  },
-  inputFocused: {
-    borderColor: "#fff",
-  },
-  inputText: {
-    color: "#fff",
-  },
-  arrowIcon: {
-    width: 16,
-    height: 16,
-    tintColor: "#fff",
-    transform: [{ rotate: "0deg" }],
-  },
-  arrowIconOpen: {
-    transform: [{ rotate: "180deg" }],
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: "rgba(0, 0, 0, 0.5)",
-  },
-  modalContent: {
-    backgroundColor: "#fff",
-    borderRadius: 8,
-    padding: 20,
-    position: "absolute",
-    zIndex: 1000,
-  },
-  dropdownItem: {
-    padding: 14,
-  },
-  dropdownItemText: {
-    color: "#333",
-  },
-  textArea: {
-    height: 200,
-    textAlignVertical: "top",
-  },
-
-  // Submit and Cancel buttons
-  buttonContainer: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    padding: 20,
-  },
-  submitButton: {
-    backgroundColor: "#E83830",
-    marginRight: 8,
-    ...commonButtonStyle,
-  },
-  cancelButton: {
-    backgroundColor: "#111",
-    ...commonButtonStyle,
-  },
-  buttonText: {
-    ...commonTextStyle,
-    fontSize: 20,
-    fontWeight: "700",
-  },
-
-  attachmentContainer: {
-    backgroundColor: "rgba(0, 0, 0, 0.1)",
-    padding: 20,
-    borderRadius: 8,
-    marginBottom: 24,
-  },
-  attachmentTitle: {
-    fontSize: 18,
-    color: "#fff",
-  },
-  attachmentSubtitle: {
-    fontSize: 14,
-    color: "#7B7B8B",
-    marginBottom: 12,
-  },
-  dottedLine: {
-    width: "100%",
-    height: 2,
-  },
-  fileInput: {
-    backgroundColor: "rgba(255, 255, 255, 0.05)",
-    borderRadius: 8,
-    padding: 20,
-    marginBottom: 10,
-    marginTop: 20,
-    color: "#fff",
-    width: "100%",
-  },
-
-  addCancelButtons: {
-    flexDirection: "row",
-    justifyContent: "space-between",
-    gap: 10,
-  },
-
-  // Add, Delete, Select File buttons
-  addButton: {
-    borderColor: "#fff",
-    borderWidth: 1,
-    backgroundColor: "transparent",
-    ...commonButtonStyle,
-  },
-  addButtonText: {
-    ...commonTextStyle,
-  },
-
-  deleteButton: {
-    borderColor: "#fff",
-    borderWidth: 1,
-    backgroundColor: "transparent",
-    width: "100%",
-    borderRadius: 8,
-    padding: 14,
-  },
-  deleteButtonText: {
-    ...commonTextStyle,
-  },
-
-  selectFileButton: {
-    backgroundColor: "#fff",
-    ...commonButtonStyle,
-  },
-  selectFileButtonText: {
-    color: "#000",
-    fontWeight: "bold",
-  },
-
-  fileRow: {
-    flexDirection: "column",
-    alignItems: "center",
-    marginTop: 12,
-    width: "100%",
-    gap: 10,
-  },
-  selectedFileText: {
-    color: "#fff",
-    backgroundColor: "#3F3F3F",
-    paddingHorizontal: 20,
-    height: 50,
-    borderRadius: 8,
-    width: "100%",
-    textAlign: "center",
-  },
-});
 
 export default ErrorFixRegistScreen;

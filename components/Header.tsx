@@ -1,5 +1,5 @@
 import React, { useState } from "react";
-import { Link, useRouter } from "expo-router"; // Use router for navigation
+import { Link, useRouter } from "expo-router";
 import { SafeAreaView } from "react-native-safe-area-context";
 import {
   View,
@@ -15,89 +15,102 @@ import {
 import { icons, images } from "@/constants";
 import theme from "../constants/theme";
 import GradientLine from "./GradientLine";
-
+const menuItems = [
+  { id: "1", name: "전력계통도", subItems: [] },
+  {
+    id: "2",
+    name: "전력발전",
+    subItems: [
+      { id: "2-1", name: "생산전력량", route: "/home", icon: icons.menu1 },
+      { id: "2-2", name: "무효전력량", route: "/create", icon: icons.menu1_1 },
+      { id: "2-3", name: "기상관측", route: "/profile", icon: icons.menu1_2 },
+      { id: "2-4", name: "발전량예측", route: "/bookmark", icon: icons.menu1_3 },
+    ],
+  },
+  {
+    id: "3",
+    name: "전력저장",
+    subItems: [
+      { id: "3-1", name: "전력입력", route: "PowerInput", icon: icons.menu2 },
+      { id: "3-2", name: "전력출력", route: "PowerOutput", icon: icons.menu2_1 },
+      { id: "3-3", name: "전력충전", route: "PowerCharge", icon: icons.menu2_2 },
+      { id: "3-4", name: "전력방전", route: "PowerDischarge", icon: icons.menu2_3 },
+    ],
+  },
+  {
+    id: "4",
+    name: "전력송전",
+    subItems: [
+      { id: "4-1", name: "SMP판매", route: "SMP_Sale", icon: icons.menu3 },
+      { id: "4-2", name: "REC판매", route: "REC_Sale", icon: icons.menu3_1 },
+      { id: "4-3", name: "SMP/REC 동향", route: "SMP_REC_Trend", icon: icons.menu3_2 },
+    ],
+  },
+  { id: "5", name: "전력관리", subItems: [] },
+  {
+    id: "6",
+    name: "장치관리",
+    subItems: [
+      { id: "6-1", name: "장치 현황", route: "/device-management/status", icon: icons.menu4 },
+      { id: "6-2", name: "문제알람 이력", route: "/device-management/error-history", icon: icons.menu4_1 },
+      { id: "6-3", name: "문제조치", route: "/(screens)/(device-management)/error-fix/history/", icon: icons.menu4_2 },
+      { id: "6-4", name: "정기점검", route: "/(screens)/(device-management)/error-fix/inspection", icon: icons.menu4_3 },
+    ],
+  },    
+  { id: "7", name: "이상징후", subItems: [] },
+  { id: "8", name: "보고서", subItems: [] },
+  {
+    id: "9",
+    name: "설정",
+    subItems: [
+      { id: "8-1", name: "장비알람설정", route: "EquipmentAlarmSettings", icon: icons.menu5 },
+      { id: "8-2", name: "알림수신자설정", route: "NotificationReceiverSettings", icon: icons.menu5_1 },
+      { id: "8-3", name: "담당자설정", route: "PersonInChargeSettings", icon: icons.menu5_2 },
+      { id: "8-4", name: "로그아웃", route: "Logout", icon: icons.menu5_3 },
+    ],
+  },
+];
 const Header = () => {
-  const router = useRouter(); // Initialize the router
+  const router = useRouter();
   const [menuVisible, setMenuVisible] = useState(false);
-  const [selectedLocation, setSelectedLocation] = useState("파주 태양광 발전소");
+  const [selectedLocation, setSelectedLocation] =
+    useState("파주 태양광 발전소");
   const [dropdownVisible, setDropdownVisible] = useState(false);
   const [expandedItemId, setExpandedItemId] = useState(null);
 
+  // Animation values
   const slideAnim = useState(new Animated.Value(-1000))[0];
+  const opacityAnim = useState(new Animated.Value(0))[0]; // Added opacity animation
   const rotationAnim = useState(new Animated.Value(0))[0];
-
-  const locations = [{ id: "1", name: "파주 태양광 발전소" }];
-
-  const menuItems = [
-    { id: "1", name: "전력계통도", subItems: [] },
-    {
-      id: "2",
-      name: "전력발전",
-      subItems: [
-        { id: "2-1", name: "생산전력량", route: "/home", icon: icons.menu1 },
-        { id: "2-2", name: "무효전력량", route: "/create", icon: icons.menu1_1 },
-        { id: "2-3", name: "기상관측", route: "/profile", icon: icons.menu1_2 },
-        { id: "2-4", name: "발전량예측", route: "/bookmark", icon: icons.menu1_3 },
-      ],
-    },
-    {
-      id: "3",
-      name: "전력저장",
-      subItems: [
-        { id: "3-1", name: "전력입력", route: "PowerInput", icon: icons.menu2 },
-        { id: "3-2", name: "전력출력", route: "PowerOutput", icon: icons.menu2_1 },
-        { id: "3-3", name: "전력충전", route: "PowerCharge", icon: icons.menu2_2 },
-        { id: "3-4", name: "전력방전", route: "PowerDischarge", icon: icons.menu2_3 },
-      ],
-    },
-    {
-      id: "4",
-      name: "전력송전",
-      subItems: [
-        { id: "4-1", name: "SMP판매", route: "SMP_Sale", icon: icons.menu3 },
-        { id: "4-2", name: "REC판매", route: "REC_Sale", icon: icons.menu3_1 },
-        { id: "4-3", name: "SMP/REC 동향", route: "SMP_REC_Trend", icon: icons.menu3_2 },
-      ],
-    },
-    { id: "5", name: "전력관리", subItems: [] },
-    {
-      id: "6",
-      name: "장치관리",
-      subItems: [
-        { id: "6-1", name: "장치 현황", route: "/device-management/status", icon: icons.menu4 },
-        { id: "6-2", name: "문제알람 이력", route: "/device-management/error-history", icon: icons.menu4_1 },
-        { id: "6-3", name: "문제조치", route: "/(screens)/(device-management)/error-fix/history/", icon: icons.menu4_2 },
-        { id: "6-4", name: "정기점검", route: "/(screens)/(device-management)/error-fix/inspection", icon: icons.menu4_3 },
-      ],
-    },    
-    { id: "7", name: "이상징후", subItems: [] },
-    { id: "8", name: "보고서", subItems: [] },
-    {
-      id: "9",
-      name: "설정",
-      subItems: [
-        { id: "8-1", name: "장비알람설정", route: "EquipmentAlarmSettings", icon: icons.menu5 },
-        { id: "8-2", name: "알림수신자설정", route: "NotificationReceiverSettings", icon: icons.menu5_1 },
-        { id: "8-3", name: "담당자설정", route: "PersonInChargeSettings", icon: icons.menu5_2 },
-        { id: "8-4", name: "로그아웃", route: "Logout", icon: icons.menu5_3 },
-      ],
-    },
-  ];
 
   const toggleMenu = () => {
     setMenuVisible(!menuVisible);
     if (!menuVisible) {
-      Animated.timing(slideAnim, {
-        toValue: 0,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 1,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
     } else {
-      Animated.timing(slideAnim, {
-        toValue: -1000,
-        duration: 300,
-        useNativeDriver: true,
-      }).start();
+      Animated.parallel([
+        Animated.timing(slideAnim, {
+          toValue: -1000,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+        Animated.timing(opacityAnim, {
+          toValue: 0,
+          duration: 300,
+          useNativeDriver: true,
+        }),
+      ]).start();
     }
   };
 
@@ -126,29 +139,47 @@ const Header = () => {
     <SafeAreaView style={styles.safeArea}>
       {!menuVisible && (
         <View style={styles.headerContainer}>
-          <Image source={images.logo} style={styles.logo} resizeMode="contain" />
+          {/* <Link href="/" style={styles.logoContainer}> */}
+            <Image
+              source={images.logo}
+              style={styles.logo}
+              resizeMode="contain"
+            />
+          {/* </Link> */}
 
-          {/* Dropdown */}
-          <TouchableOpacity onPress={toggleDropdown} style={styles.locationContainer}>
+          <TouchableOpacity
+            onPress={toggleDropdown}
+            style={styles.locationContainer}
+          >
             <Text style={styles.locationText}>{selectedLocation}</Text>
-            <Image source={icons.down01} style={styles.dropdownIcon} resizeMode="contain" />
+            <Image
+              source={icons.down01}
+              style={styles.dropdownIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
 
           {/* Menu Icon */}
           <TouchableOpacity onPress={toggleMenu}>
-            <Image source={icons.menu} style={styles.menuIcon} resizeMode="contain" />
+            <Image
+              source={icons.menu}
+              style={styles.menuIcon}
+              resizeMode="contain"
+            />
           </TouchableOpacity>
         </View>
       )}
 
-      {/* Dropdown List */}
       {dropdownVisible && (
         <View style={styles.dropdownList}>
           <FlatList
             data={locations}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <TouchableOpacity onPress={() => selectLocation(item)} style={styles.dropdownItem}>
+              <TouchableOpacity
+                onPress={() => selectLocation(item)}
+                style={styles.dropdownItem}
+              >
                 <Text style={styles.dropdownItemText}>{item.name}</Text>
               </TouchableOpacity>
             )}
@@ -156,20 +187,36 @@ const Header = () => {
         </View>
       )}
 
-      {/* Full-screen Menu Modal */}
       <Modal
         transparent={true}
         visible={menuVisible}
         onRequestClose={toggleMenu}
         animationType="none"
       >
-        <Animated.View style={[styles.menuModal, { transform: [{ translateY: slideAnim }] }]}>
+        <Animated.View
+          style={[
+            styles.menuModal,
+            {
+              transform: [{ translateY: slideAnim }],
+              opacity: opacityAnim, 
+            },
+          ]}
+        >
           <SafeAreaView>
-            {/* Header with close button */}
             <View style={styles.menuHeader}>
-              <Image source={images.logo} style={styles.logo} resizeMode="contain" />
+              <Link href="/" style={styles.logoContainer}>
+                <Image
+                  source={images.logo}
+                  style={styles.logo}
+                  resizeMode="contain"
+                />
+              </Link>
               <TouchableOpacity onPress={toggleMenu}>
-                <Image source={icons.close} style={styles.closeIcon} resizeMode="contain" />
+                <Image
+                  source={icons.close}
+                  style={styles.closeIcon}
+                  resizeMode="contain"
+                />
               </TouchableOpacity>
             </View>
 
@@ -195,12 +242,23 @@ const Header = () => {
                       }}
                       style={styles.menuItem}
                     >
-                      <Text style={[styles.menuItemText, isExpanded && styles.expandedText]}>
+                      <Text
+                        style={[
+                          styles.menuItemText,
+                          isExpanded && styles.expandedText,
+                        ]}
+                      >
                         {item.name}
                       </Text>
                       {!["1", "5", "7", "8"].includes(item.id) && (
-                        <Animated.View style={{ transform: [{ rotate: arrowRotation }] }}>
-                          <Image source={icons.down02} style={styles.arrowIcon} resizeMode="contain" />
+                        <Animated.View
+                          style={{ transform: [{ rotate: arrowRotation }] }}
+                        >
+                          <Image
+                            source={icons.down02}
+                            style={styles.arrowIcon}
+                            resizeMode="contain"
+                          />
                         </Animated.View>
                       )}
                     </TouchableOpacity>
@@ -211,13 +269,19 @@ const Header = () => {
                         <TouchableOpacity
                           key={subItem.id}
                           onPress={() => {
-                            toggleMenu(); // Close the menu
-                            router.push(subItem.route); // Navigate to the selected route
+                            toggleMenu();
+                            router.push(subItem.route);
                           }}
                           style={styles.subMenuItem}
                         >
-                          <Image source={subItem.icon} style={styles.subMenuIcon} resizeMode="contain" />
-                          <Text style={styles.subMenuItemText}>{subItem.name}</Text>
+                          <Image
+                            source={subItem.icon}
+                            style={styles.subMenuIcon}
+                            resizeMode="contain"
+                          />
+                          <Text style={styles.subMenuItemText}>
+                            {subItem.name}
+                          </Text>
                         </TouchableOpacity>
                       ))}
                   </View>
@@ -231,25 +295,28 @@ const Header = () => {
   );
 };
 
-
 const styles = StyleSheet.create({
   safeArea: {
-    backgroundColor: 'rgba(0, 12, 101, 0.9)',
+    backgroundColor: theme.colors.background,
   },
   headerContainer: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: theme.spacing.medium,
+  },
+  logoContainer: {
+    justifyContent: "center",
+    alignItems: "center",
+    flexDirection: "row",
   },
   logo: {
     width: 80,
     height: 42,
   },
   locationContainer: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: theme.spacing.xLarge, // Adjusted for alignment
+    flexDirection: "row",
+    alignItems: "center",
   },
   locationText: {
     color: theme.colors.text,
@@ -261,17 +328,17 @@ const styles = StyleSheet.create({
     marginLeft: theme.spacing.small,
   },
   menuIcon: {
-    width: 20,
-    height: 20,
+    width: 22,
+    height: 30,
   },
   dropdownList: {
-    position: 'absolute',
+    position: "absolute",
     top: 56,
     left: 0,
     right: 0,
     backgroundColor: theme.colors.background,
     zIndex: 50,
-    shadowColor: '#000',
+    shadowColor: "#000",
     shadowOffset: { width: 0, height: 2 },
     shadowOpacity: 0.1,
     shadowRadius: 4,
@@ -287,15 +354,17 @@ const styles = StyleSheet.create({
   },
   menuModal: {
     flex: 1,
-    backgroundColor: 'rgba(22, 46, 114, 0.90)',
-    width: '100%',
-    padding: theme.spacing.medium,
+    backgroundColor: "rgba(22, 46, 114, 0.90)",
+    width: "100%",
+    padding: theme.spacing.small,
+    marginTop: 25,
     zIndex: 10,
+    opacity: 0, // Initially hidden
   },
   menuHeader: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: theme.spacing.medium,
     paddingVertical: theme.spacing.small,
   },
@@ -304,12 +373,12 @@ const styles = StyleSheet.create({
     height: 20,
   },
   menuItem: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    alignItems: 'center',
+    flexDirection: "row",
+    justifyContent: "space-between",
+    alignItems: "center",
     paddingHorizontal: theme.spacing.medium,
     paddingVertical: theme.spacing.medium,
-    borderBottomColor: 'rgba(255, 255, 255, 0.2)',
+    borderBottomColor: "rgba(255, 255, 255, 0.2)",
     borderBottomWidth: 1,
   },
   menuItemText: {
@@ -317,15 +386,15 @@ const styles = StyleSheet.create({
     color: theme.colors.text,
   },
   expandedText: {
-    color: '#F33028',
+    color: "#F33028",
   },
   arrowIcon: {
     width: 20,
     height: 20,
   },
   subMenuItem: {
-    flexDirection: 'row',
-    alignItems: 'center',
+    flexDirection: "row",
+    alignItems: "center",
     paddingLeft: theme.spacing.large,
     paddingRight: theme.spacing.medium,
     paddingVertical: theme.spacing.small,

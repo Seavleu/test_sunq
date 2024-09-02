@@ -2,7 +2,7 @@ import React from 'react';
 import { Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useNavigation, useRoute } from '@react-navigation/native';
 
-const TabNavigator = ({ title, routePath }) => {
+const TabNavigator = ({ title, routePath } : TabNavigatorProps) => {
   const navigation = useNavigation();
   const route = useRoute();
 

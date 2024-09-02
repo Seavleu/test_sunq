@@ -22,7 +22,7 @@ export const useInitializeAuth = () => {
 
     const fetchCurrentUser = async () => {
       try {
-        const response = await api.get<any>('/api/user/me');
+        const response = await api.get<any>('/api/user/me'); // TODO: modify endpoint
         if (response.data) {
           setIsLogged(true);
           setUser(response.data);

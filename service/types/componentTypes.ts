@@ -24,7 +24,8 @@ declare type AlertBoxProps = {
 
 declare type CustomCheckBoxProps = {
   value: boolean;
-  onValueChange: () => void;
+  onValueChange: (newValue: boolean) => void;
+  label?: string;
 };
 
 declare type DropdownProps = {

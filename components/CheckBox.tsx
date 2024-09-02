@@ -2,13 +2,7 @@ import React from 'react';
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 
-interface CustomCheckBoxProps {
-  value: boolean;
-  onValueChange: (newValue: boolean) => void;
-  label?: string;
-}
-
-const CustomCheckBox: React.FC<CustomCheckBoxProps> = ({ value, onValueChange, label }) => {
+const CustomCheckBox = ({ value, onValueChange, label } : CustomCheckBoxProps) => {
   return (
     <TouchableOpacity onPress={() => onValueChange(!value)} style={styles.checkboxContainer}>
       <View style={[styles.checkbox, value && styles.checkedCheckbox]}>

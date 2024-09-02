@@ -80,7 +80,7 @@ const Header = () => {
 
   // Animation values
   const slideAnim = useState(new Animated.Value(-1000))[0];
-  const opacityAnim = useState(new Animated.Value(0))[0]; // Added opacity animation
+  const opacityAnim = useState(new Animated.Value(0))[0]; 
   const rotationAnim = useState(new Animated.Value(0))[0];
 
   const toggleMenu = () => {

@@ -12,6 +12,7 @@ const ErrorFixDetailScreen = () => {
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
 
+  // TODO: Swap with DEVICE_API
   const [resData, setResData] = useState({
     device_error_seq: null,
     title: null,

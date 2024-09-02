@@ -15,6 +15,9 @@ const ErrorFixListScreen = () => {
   const [selectedOption, setSelectedOption] = useState("제목");
   const navigation = useNavigation();
 
+  // TODO: integrate DEVICE_API
+  // TODO: Declare parameter types
+
   const handleSearch = () => {
     if (searchText.length > 1) {
       const filtered = resData.filter(

@@ -8,7 +8,7 @@ import TabNavigator from "@/components/TabNavigator";
 import { images, icons } from "@/constants"; 
 import errorFixList from "@/constants/errorFixList";
 
-// Generate dynamically from errorFixList
+// TODO: refactor 
 const staticDeviceErrList = errorFixList.map((item) => ({
   device_error_seq: item.device_error_fix_seq,
   title: item.title,
@@ -39,6 +39,7 @@ const ErrorFixRegistScreen = () => {
     width: 0,
   });
 
+  // TODO: Modify with API 
   useEffect(() => {
     if (route.params && route.params.editData) {
       const editData = route.params.editData;
@@ -78,6 +79,7 @@ const ErrorFixRegistScreen = () => {
     console.log("제출된 데이터:", reqData);
   };
 
+   // TODO: Set attachment size
   const handleFileSelection = async () => {
     Alert.alert(
       "파일 유형 선택",
@@ -98,18 +100,18 @@ const ErrorFixRegistScreen = () => {
             }
           },
         },
-        {
-          text: "문서",
-          onPress: async () => {
-            let result = await DocumentPicker.getDocumentAsync({
-              type: "*/*",
-            });
+        // {
+        //   text: "문서",
+        //   onPress: async () => {
+        //     let result = await DocumentPicker.getDocumentAsync({
+        //       type: "*/*",
+        //     });
 
-            if (result.type !== "cancel") {
-              setSelectedFile(result);
-            }
-          },
-        },
+        //     if (result.type !== "cancel") {
+        //       setSelectedFile(result);
+        //     }
+        //   },
+        // },
         {
           text: "취소",
           style: "cancel",

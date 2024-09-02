@@ -2,21 +2,30 @@ import { makeAutoObservable } from 'mobx';
 import * as SecureStore from 'expo-secure-store';
 import * as Crypto from 'expo-crypto';
 
+/**
+ * UserStore 클래스는 사용자 인증 데이터를 관리하는 MobX 스토어로,
+ * 토큰 관리 및 사용자 정보를 expo secure storage를 사용하여 암호화 및 복호화 형태로 처리합니다.
+ */
 class UserStore {
   token: string | null = null;
   userInfo: any = null;
 
   constructor() {
-    makeAutoObservable(this);
-    this.loadToken();
-    this.loadUserInfo();
+    makeAutoObservable(this);  
+    this.loadToken();          
+    this.loadUserInfo();      
   }
 
-  // Encrypts data using SHA-256
+   /**
+   * 복호화용 자리 표시자(필요할 경우). 
+   * SHA-256은 해시이므로 복호화할 수 없으며, 이 함수는 입력값을 그대로 반환합니다.
+   * @param encryptedData - "복호화"할 문자열 데이터
+   * @returns - 입력된 동일한 문자열
+   */
   async encryptData(data: string): Promise<string> {
     return Crypto.digestStringAsync(Crypto.CryptoDigestAlgorithm.SHA256, data);
   }
-  
+ 
   async decryptData(encryptedData: string): Promise<string> {
     return encryptedData;
   }
@@ -47,6 +56,7 @@ class UserStore {
     }
   }
 
+  // 암호화 후 사용자 정보를 안전하게 저장합니다.
   async setUserInfo(userInfo: any) {
     try {
       const encryptedUserInfo = await this.encryptData(JSON.stringify(userInfo));
@@ -58,6 +68,7 @@ class UserStore {
     }
   }
 
+ // 보안 저장소에서 사용자 정보를 로드합니다.  사용자 정보를 복호화하여 `userInfo` 프로퍼티에 할당합니다.
   async loadUserInfo() {
     try {
       const encryptedUserInfo = await SecureStore.getItemAsync('userInfo');
@@ -73,6 +84,7 @@ class UserStore {
     }
   }
 
+  // 저장된 토큰과 사용자 정보를 지우면 보안 저장소에서 관련 데이터가 삭제됩니다.
   async logout() {
     try {
       this.token = null;
@@ -85,6 +97,6 @@ class UserStore {
     }
   }
 }
-
+ 
 const userStore = new UserStore();
 export default userStore;

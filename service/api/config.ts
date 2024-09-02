@@ -23,6 +23,7 @@ api.interceptors.request.use(
   }
 );
 
+// 토큰 만료 처리 및 토큰 자동 새로 고침
 api.interceptors.response.use(
   (response) => response,
   async (error) => {
@@ -30,21 +31,17 @@ api.interceptors.response.use(
 
     if (error.response.status === 401 || error.response.status === 403) {
       try {
-       // 토큰 새로 고침 시도
-        const refreshResponse = await api.get('/api/refreshToken');
+        const refreshResponse = await api.get('/api/refreshToken');          // 토큰 새로 고침 시도
         const newToken = refreshResponse.data.accessToken;
 
-        // 새 토큰 저장
-        await userStore.setToken(newToken);
+        await userStore.setToken(newToken);                                  // 새 토큰 저장
 
-        // 새 토큰으로 원래 요청 재시도
-        originalRequest.headers.Authorization = `Bearer ${newToken}`;
+        originalRequest.headers.Authorization = `Bearer ${newToken}`;        // 새 토큰으로 원래 요청 재시도
         return api(originalRequest);
       } catch (refreshError) {
         console.error('Token refresh failed:', refreshError);
 
-        // 새로 고침에 실패할 경우 사용자 로그아웃
-        await userStore.logout();
+        await userStore.logout();                                            // 새로 고침에 실패할 경우 사용자 로그아웃
         console.log('Logged out due to token refresh failure.');
         return Promise.reject(refreshError);
       }

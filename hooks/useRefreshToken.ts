@@ -1,6 +1,6 @@
 import { useLayoutEffect } from 'react';
 import api from '@/service/api/config';
-import userStore from '@/stores/userStore';
+import userStore from '@/utils/storage';
 
 export const useRefreshToken = (
   setIsLogged: React.Dispatch<React.SetStateAction<boolean>>,

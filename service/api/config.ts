@@ -1,6 +1,6 @@
 import axios from 'axios';
 import { EXPO_API_URL } from '@env';
-import userStore from '@/stores/userStore';
+import userStore from '@/utils/storage';
 
 const api = axios.create({
   baseURL: EXPO_API_URL,

@@ -204,13 +204,13 @@ const Header = () => {
         >
           <SafeAreaView>
             <View style={styles.menuHeader}>
-              <Link href="/" style={styles.logoContainer}>
+              {/* <Link href="/" style={styles.logoContainer}> */}
                 <Image
                   source={images.logo}
                   style={styles.logo}
                   resizeMode="contain"
                 />
-              </Link>
+              {/* </Link> */}
               <TouchableOpacity onPress={toggleMenu}>
                 <Image
                   source={icons.close}

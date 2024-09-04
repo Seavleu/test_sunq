@@ -80,11 +80,11 @@ const commonTextStyles = {
       padding: theme.spacing.medium,
       flexDirection: 'row',
     },
-    modalImage: {
-      width: 300,
-      height: 300,
-      marginBottom: theme.spacing.medium,
-    },
+    // modalImage: {
+    //   width: 300,
+    //   height: 300,
+    //   marginBottom: theme.spacing.medium,
+    // },
     closeButton: {
       ...buttonStyles,
       backgroundColor: theme.colors.error,
@@ -214,6 +214,68 @@ const commonTextStyles = {
     },
     footerSpace: {
       height: theme.spacing.xLarge,  
+    },
+
+    thumbnailContainer: {
+      flexDirection: "row", 
+      marginVertical: 10,   
+      flexWrap: "wrap",  
+    },
+    thumbnailImage: {
+      width: 60,
+      height: 60,
+      borderRadius: 60,
+      marginRight: 40,     
+      marginBottom: 10,    
+    },
+   
+    // Modal Styles
+    modalContainer: {
+      flex: 1,
+      justifyContent: "center",
+      alignItems: "center",
+      backgroundColor: "rgba(0, 0, 0, 0.5)",
+    },
+    modalContent: {
+      width: 340,
+      borderRadius: 14,
+      backgroundColor: "#FFF",
+      padding: 20,
+      boxShadow: "0px 10px 10px 0px rgba(0, 0, 0, 0.10)",
+      justifyContent: "center",
+      alignItems: "center",
+    },
+    modalHeader: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      alignItems: "center",
+      width: "100%",
+    },
+    modalTitle: {
+      fontSize: 16,
+      fontWeight: "bold",
+    },
+    iconClose: {
+      width: 20,
+      height: 20,
+      tintColor: "#000",
+    },
+    modalImage: {
+      width: 300,
+      height: 190,
+      marginVertical: 10,
+      backgroundColor: "black", // Fallback color in case image is not available
+    },
+    modalActions: {
+      flexDirection: "row",
+      justifyContent: "space-between",
+      width: "100%",
+      marginTop: 10,
+    },
+    icon: {
+      width: 30,
+      height: 30,
+      tintColor: "#000",
     },
   });
   

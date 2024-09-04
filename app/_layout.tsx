@@ -31,6 +31,7 @@ export default function RootLayout() {
       <GlobalProvider>
         {!isAuthRoute && <Header />}
         <Stack screenOptions={{ headerShown: false }}>
+          <Stack.Screen name="index" options={{ headerShown: false }} />
           <Stack.Screen name="(auth)" options={{ headerShown: false }} />
           <Stack.Screen name="(screens)" options={{ headerShown: false }} />
         </Stack>

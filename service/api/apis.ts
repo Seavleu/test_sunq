@@ -23,7 +23,7 @@ import {
   GetErrorFixTitleListRequest,
   GetInverterStatsRequest,
   GetErrorAlarmListRequest,
-} from "../types/apiTypes";
+} from "../../types/apiTypes";
 
 export const LOGIN_API = {
   login: (data: LoginRequest) => apiClient.post("/api/login/auth", data),

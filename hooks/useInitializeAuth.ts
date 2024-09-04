@@ -1,6 +1,6 @@
 import { useState, useLayoutEffect } from 'react';
 import api from '@/service/api/config';
-import userStore from '@/stores/userStore';
+import userStore from '@/utils/storage';
 
 export const useInitializeAuth = () => {
   const [isLogged, setIsLogged] = useState<boolean>(false);
@@ -22,7 +22,7 @@ export const useInitializeAuth = () => {
 
     const fetchCurrentUser = async () => {
       try {
-        const response = await api.get<any>('/api/user/me'); // TODO: modify endpoint
+        const response = await api.post<any>('/api/login/auth'); // TODO: modify endpoint
         if (response.data) {
           setIsLogged(true);
           setUser(response.data);

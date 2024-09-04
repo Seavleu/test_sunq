@@ -7,7 +7,7 @@ import {Button, FormField, AlertBox, CustomCheckBox} from '@/components';
 
 import { images } from '@/constants';
 import { LOGIN_API } from '@/service/api/apis';
-import userStore from '@/stores/userStore';
+import userStore from '@/utils/storage';
 
 const LoginScreen = () => {
   const router = useRouter();
@@ -84,7 +84,7 @@ const LoginScreen = () => {
         }
 
         userStore.setToken(token);
-        router.replace('/(device-management)/error-fix/history/list');
+        router.replace('/_sitemap');
       } else {
         setError(response.data.message);
       }

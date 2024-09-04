@@ -35,6 +35,7 @@ import down02 from "../assets/common/ico_down02.png";
 import download from "../assets/common/ico_download.png";
 import exclamation from "../assets/common/ico_exclamation.png";
 import exclamation02 from "../assets/common/ico_exclamation02.png";
+import expand from "../assets/common/ico_full.png"
 import img from "../assets/common/ico_img.png";
 import line01 from "../assets/common/ico_line02.png";
 import line02 from "../assets/common/ico_line02.png";
@@ -150,6 +151,7 @@ export default {
   download,
   exclamation,
   exclamation02,
+  expand,
   img,
   line01,
   line02,

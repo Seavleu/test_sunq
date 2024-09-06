@@ -1,5 +1,6 @@
 import { StyleSheet } from 'react-native';
 import theme from '@/constants/theme';
+import { withDecay } from 'react-native-reanimated';
 
 const commonTextStyles = {
     color: theme.colors.text,
@@ -264,7 +265,7 @@ const commonTextStyles = {
       width: 300,
       height: 190,
       marginVertical: 10,
-      backgroundColor: "black", // Fallback color in case image is not available
+      backgroundColor: '#111'
     },
     modalActions: {
       flexDirection: "row",
@@ -277,6 +278,17 @@ const commonTextStyles = {
       height: 30,
       tintColor: "#000",
     },
+
+    fullScreenContainer: {
+      width: '100%',
+      height: '100%',
+      borderRadius:0
+    },
+    fullScreenContent: {  
+      backgroundColor: '#fff',
+      borderRadius: 10,
+      overflow: 'hidden',
+    }
   });
   
   export default styles;

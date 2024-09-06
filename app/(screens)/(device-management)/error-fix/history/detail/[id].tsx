@@ -1,13 +1,22 @@
-import React, { useEffect, useState } from "react";
-import { View, Text, Image, ScrollView, Modal, TouchableOpacity } from "react-native";
+import React, { useEffect, useState, useSyncExternalStore } from "react";
+import { View, Text, Image, ScrollView, Modal, TouchableOpacity, Dimensions, Alert } from "react-native";
 import { RouteProp, useRoute, useNavigation } from "@react-navigation/native";
-import { icons, images } from "@/constants";
+import { icons, images, weathers } from "@/constants";
 
 import {Button, TabNavigator} from "@/components"; 
 import errorFixList from "@/constants/errorFixList";
 import styles from "./styles";
 
+import * as FileSystem from 'expo-file-system'; 
+import * as IntentLauncher from 'expo-intent-launcher';
+import { DEVICE_API } from "@/service/api/apis";
+import { LightSpeedInLeft } from "react-native-reanimated";
+
+const { width, height } = Dimensions.get('window');
+
 const ErrorFixDetailScreen = () => {
+  const [fullScreen, setfullScreen] = useState(false)
+  const [imageZoom, setImageZoom] = useState(1)
   const [modalVisible, setModalVisible] = useState(false);
   const [selectedImage, setSelectedImage] = useState(null);
   const [currentIndex, setCurrentIndex] = useState(0);
@@ -48,7 +57,6 @@ const ErrorFixDetailScreen = () => {
     setModalVisible(false)
   }
   
-
   const handlePrevImage = () => {
     if (resData.file_list.length > 0) {
       const newIndex = currentIndex === 0 ? resData.file_list.length - 1 : currentIndex - 1;
@@ -68,6 +76,37 @@ const ErrorFixDetailScreen = () => {
   const handleEdit = () => {
     navigation.navigate("ErrorFixRegistScreen", { editData: resData });
   };
+ 
+  const handleExpandImage = () => {
+    setfullScreen(prevFullScreen => !prevFullScreen)
+  }
+
+  const handleZoomIn = () => {
+    setImageZoom(prevZoom => prevZoom * 1.2)
+  }
+
+  const handleZoomOut = () => { 
+    setImageZoom(prevZoom => Math.max(prevZoom / 1.2, 1));
+  };
+
+  const  handleDownload = async () => {
+    if(!selectedImage) {
+      Alert.alert('No image seleted', 'Please select an image to download')
+      return
+    }
+    try {
+      const fileExtension = selectedImage.split('.').pop()
+      const fileUri = FileSystem.documentDirectory + `downloaded_image.${fileExtension}`
+
+      const {uri} = await FileSystem.downloadAsync(selectedImage, fileUri)
+      
+      Alert.alert('Download Successful', `Image saved to ${uri}`)
+
+    } catch(error) {
+      console.error('Error Downloding the image', error)
+      Alert.alert('Download error', 'Failed to download the image.')
+    }
+  }
 
   const renderDetailHeader = () => (
     <View style={styles.tabContainer}>
@@ -174,45 +213,46 @@ const ErrorFixDetailScreen = () => {
   const renderModal = () => (
     selectedImage && (
       <Modal
-      animationType="slide"
-      transparent={true}
-      visible={modalVisible}
-      onRequestClose={handleCloseModal}
-    >
-      <View style={styles.modalContainer}>
-        <View style={styles.modalContent}>
-          <View style={styles.modalHeader}>
-            <Text style={styles.modalTitle}>{selectedImage.name}</Text>
-            <TouchableOpacity onPress={handleCloseModal}>
-              <Image source={icons.close} style={styles.iconClose} />
-            </TouchableOpacity>
-          </View>
-
-          <Image
-            source={{ uri: selectedImage.url }}
-            style={styles.modalImage}
-            resizeMode="contain"
-          />
-
-          <View style={styles.modalActions}>
-            <TouchableOpacity onPress={() => console.log("Expand image")}>
-              <Image source={icons.expand} style={styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("Zoom in")}>
-              <Image source={icons.zoomin} style={styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("Zoom out")}>
-              <Image source={icons.zoomout} style={styles.icon} />
-            </TouchableOpacity>
-            <TouchableOpacity onPress={() => console.log("Download image")}>
-              <Image source={icons.download} style={styles.icon} />
-            </TouchableOpacity>
+        animationType="slide"
+        transparent={true}
+        visible={modalVisible}
+        onRequestClose={handleCloseModal}
+      >
+        <View style={[styles.modalContainer, fullScreen && styles.fullScreenContainer]}>
+          <View style={[styles.modalContent, fullScreen && styles.fullScreenContent]}>
+            <View style={styles.modalHeader}>
+              <Text style={styles.modalTitle}>{selectedImage.name || 'Image'}</Text>
+              <TouchableOpacity onPress={handleCloseModal}>
+                <Image source={icons.close} style={styles.iconClose} />
+              </TouchableOpacity>
+            </View>
+  
+            <Image
+              source={{ uri: selectedImage.uri }}
+              style={[styles.modalImage, { transform: [{ scale: imageZoom }] }]}
+              resizeMode="contain"
+            />
+  
+            <View style={styles.modalActions}>
+              <TouchableOpacity onPress={handleExpandImage}>
+                <Image source={icons.expand} style={styles.icon} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleZoomIn}>
+                <Image source={icons.zoomin} style={styles.icon} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleZoomOut}>
+                <Image source={icons.zoomout} style={styles.icon} />
+              </TouchableOpacity>
+              <TouchableOpacity onPress={handleDownload}>
+                <Image source={icons.download} style={styles.icon} />
+              </TouchableOpacity>
+            </View>
           </View>
         </View>
-      </View>
-    </Modal>
+      </Modal>
     )
   );
+  
 
   return (
     <ScrollView style={styles.container}>
@@ -233,6 +273,9 @@ const ErrorFixDetailScreen = () => {
           </View>
         </>
       )}
+      
+      {renderDetailHeader()}
+      {renderImageThumbnails()}
       {renderModal()}
       <View style={styles.footerSpace} />
     </ScrollView>
